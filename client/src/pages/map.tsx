@@ -151,15 +151,15 @@ export default function Map() {
 
     // Add spot markers
     spotsData.forEach((spot: Spot) => {
-      const availableRickshaws = rickshaws.filter(r => r.currentSpotId === spot.id);
-      const hasRickshaws = availableRickshaws.length > 0;
+      const availableAirbears = rickshaws.filter(r => r.currentSpotId === spot.id);
+      const hasAirbears = availableAirbears.length > 0;
       
       // Create custom AirBear icon with enhanced special effects
       const iconHtml = `
         <div class="relative group cursor-pointer airbear-marker">
           <!-- Main AirBear marker with holographic effects -->
-          <div class="w-16 h-16 border-4 border-${hasRickshaws ? 'emerald-500' : 'gray-400'} rounded-full 
-                      ${hasRickshaws ? 'animate-pulse-glow shadow-xl shadow-emerald-500/60' : ''} 
+          <div class="w-16 h-16 border-4 border-${hasAirbears ? 'emerald-500' : 'gray-400'} rounded-full 
+                      ${hasAirbears ? 'animate-pulse-glow shadow-xl shadow-emerald-500/60' : ''} 
                       bg-gradient-to-br from-white via-emerald-50 to-lime-100
                       flex items-center justify-center hover:scale-125 transition-all duration-500 group-hover:animate-rickshaw-bounce
                       relative overflow-hidden">
@@ -168,13 +168,13 @@ export default function Map() {
             <div class="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400 via-pink-400 via-red-400 via-yellow-400 via-green-400 via-blue-400 to-purple-400 opacity-20 animate-spin-slow"></div>
             
             <!-- Fire/smoke particles on hover -->
-            ${hasRickshaws ? Array.from({ length: 6 }, (_, i) => `
+            ${hasAirbears ? Array.from({ length: 6 }, (_, i) => `
               <div class="absolute w-1 h-1 bg-orange-500 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-particle"
                    style="left: ${50 + Math.cos(i * 60 * Math.PI / 180) * 25}%; top: ${50 + Math.sin(i * 60 * Math.PI / 180) * 25}%; animation-delay: ${i * 0.1}s;"></div>
             `).join('') : ''}
             
             <!-- AirBear mascot with enhanced effects -->
-            <div class="text-2xl ${hasRickshaws ? 'animate-airbear-bounce' : ''} group-hover:animate-spin relative z-10">
+            <div class="text-2xl ${hasAirbears ? 'animate-airbear-bounce' : ''} group-hover:animate-spin relative z-10">
               🐻
             </div>
             
@@ -184,7 +184,7 @@ export default function Map() {
                    style="left: 50%; top: -8px; transform-origin: 50% 32px; transform: rotate(${i * 30}deg); animation: solar-rays 4s linear infinite; animation-delay: ${i * 0.1}s;"></div>
             `).join('')}
             
-            ${hasRickshaws ? `
+            ${hasAirbears ? `
               <!-- Spinning wheel effect -->
               <div class="absolute inset-2 rounded-full border-2 border-lime-400 opacity-60 animate-wheel-spin"></div>
               <div class="absolute inset-4 rounded-full border border-emerald-400 opacity-40 animate-spin-slow"></div>
@@ -199,12 +199,12 @@ export default function Map() {
           </div>
           
           <!-- Enhanced availability counter with special effects -->
-          ${availableRickshaws.length > 0 ? `
+          ${availableAirbears.length > 0 ? `
             <div class="absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-r from-emerald-500 via-lime-500 to-green-400 text-white rounded-full 
                         flex items-center justify-center text-sm font-bold shadow-xl animate-confetti-burst border-2 border-white
                         relative overflow-hidden">
               <div class="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 opacity-30 animate-holographic"></div>
-              <span class="relative z-10">${availableRickshaws.length}</span>
+              <span class="relative z-10">${availableAirbears.length}</span>
             </div>
           ` : ''}
           
@@ -247,14 +247,14 @@ export default function Map() {
           <div class="space-y-3">
             <div class="flex items-center justify-between text-sm">
               <span class="flex items-center">
-                <span class="w-3 h-3 rounded-full ${hasRickshaws ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'} mr-2"></span>
+                <span class="w-3 h-3 rounded-full ${hasAirbears ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'} mr-2"></span>
                 AirBears Available
               </span>
-              <span class="font-semibold ${hasRickshaws ? 'text-emerald-600' : 'text-gray-500'}">
-                ${hasRickshaws ? `${availableRickshaws.length} ready` : 'None'}
+              <span class="font-semibold ${hasAirbears ? 'text-emerald-600' : 'text-gray-500'}">
+                ${hasAirbears ? `${availableAirbears.length} ready` : 'None'}
               </span>
             </div>
-            ${hasRickshaws ? `
+            ${hasAirbears ? `
               <div class="text-xs text-emerald-600 italic mb-2">
                 "Glide with AirBear, eco-rides so rare!"
               </div>
@@ -352,7 +352,7 @@ export default function Map() {
               <div className="flex items-center space-x-4 text-sm">
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                  <span>{rickshaws?.filter(r => r.isAvailable).length || 0} Available</span>
+                  <span>{availableAirbears.length} AirBears Available</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-amber-500 rounded-full animate-pulse"></div>
@@ -413,7 +413,7 @@ export default function Map() {
           <div className="mt-6 flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center space-x-2">
               <RickshawWheel size="sm" />
-              <span>Available Rickshaw</span>
+              <span>Available AirBear</span>
             </div>
             <div className="flex items-center space-x-2">
               <Store className="h-4 w-4 text-amber-500" />
@@ -434,9 +434,9 @@ export default function Map() {
           transition={{ duration: 0.8, delay: 0.4 }}
         >
           {spotsData?.map((spot: Spot, index: number) => {
-            const availableRickshaws = rickshaws?.filter(r => r.currentSpotId === spot.id) || [];
-            const avgBattery = availableRickshaws.length > 0 
-              ? Math.round(availableRickshaws.reduce((sum, r) => sum + r.batteryLevel, 0) / availableRickshaws.length)
+            const availableAirbears = rickshaws?.filter(r => r.currentSpotId === spot.id) || [];
+            const avgBattery = availableAirbears.length > 0 
+              ? Math.round(availableAirbears.reduce((sum, r) => sum + r.batteryLevel, 0) / availableAirbears.length)
               : 0;
             
             return (
@@ -450,7 +450,7 @@ export default function Map() {
                   className="hover-lift glass-morphism cursor-pointer group"
                   onClick={() => {
                     setSelectedSpot(spot);
-                    if (availableRickshaws.length > 0) {
+                    if (availableAirbears.length > 0) {
                       setShowBookingDialog(true);
                     }
                   }}
@@ -461,8 +461,8 @@ export default function Map() {
                       <span className="truncate">{spot.name}</span>
                       <RickshawWheel 
                         size="sm" 
-                        animated={availableRickshaws.length > 0}
-                        className={availableRickshaws.length > 0 ? "text-primary" : "text-muted-foreground"}
+                        animated={availableAirbears.length > 0}
+                        className={availableAirbears.length > 0 ? "text-primary" : "text-muted-foreground"}
                       />
                     </CardTitle>
                   </CardHeader>
@@ -470,14 +470,14 @@ export default function Map() {
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">Available</span>
                       <Badge 
-                        variant={availableRickshaws.length > 0 ? "default" : "secondary"}
-                        className={availableRickshaws.length > 0 ? "bg-green-500" : ""}
+                        variant={availableAirbears.length > 0 ? "default" : "secondary"}
+                        className={availableAirbears.length > 0 ? "bg-green-500" : ""}
                       >
-                        {availableRickshaws.length} rickshaw{availableRickshaws.length !== 1 ? 's' : ''}
+                        {availableAirbears.length} AirBear{availableAirbears.length !== 1 ? 's' : ''}
                       </Badge>
                     </div>
-                    
-                    {availableRickshaws.length > 0 && (
+
+                    {availableAirbears.length > 0 && (
                       <>
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-muted-foreground">Avg Battery</span>
@@ -486,7 +486,7 @@ export default function Map() {
                             <span className="text-sm font-medium">{avgBattery}%</span>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-muted-foreground">Wait Time</span>
                           <div className="flex items-center space-x-2">
@@ -496,14 +496,14 @@ export default function Map() {
                         </div>
                       </>
                     )}
-                    
+
                     <Button 
                       size="sm" 
                       className="w-full eco-gradient text-white"
-                      disabled={availableRickshaws.length === 0}
+                      disabled={availableAirbears.length === 0}
                       data-testid={`button-book-from-${spot.name.toLowerCase().replace(/\s+/g, '-')}`}
                     >
-                      {availableRickshaws.length > 0 ? "Book Ride" : "No Rickshaws"}
+                      {availableAirbears.length > 0 ? "Book Ride" : "No AirBears"}
                     </Button>
                   </CardContent>
                 </Card>

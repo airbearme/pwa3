@@ -22,6 +22,8 @@ export const users = pgTable("users", {
   ecoPoints: integer("eco_points").notNull().default(0),
   totalRides: integer("total_rides").notNull().default(0),
   co2Saved: decimal("co2_saved", { precision: 10, scale: 2 }).notNull().default("0"),
+  hasCeoTshirt: boolean("has_ceo_tshirt").notNull().default(false),
+  tshirtPurchaseDate: timestamp("tshirt_purchase_date"),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
   updatedAt: timestamp("updated_at").notNull().default(sql`now()`)
 });
@@ -63,6 +65,7 @@ export const rides = pgTable("rides", {
   distance: decimal("distance", { precision: 8, scale: 2 }), // km
   co2Saved: decimal("co2_saved", { precision: 8, scale: 2 }), // kg
   fare: decimal("fare", { precision: 8, scale: 2 }).notNull(),
+  isFreeTshirtRide: boolean("is_free_tshirt_ride").notNull().default(false),
   requestedAt: timestamp("requested_at").notNull().default(sql`now()`),
   acceptedAt: timestamp("accepted_at"),
   startedAt: timestamp("started_at"),

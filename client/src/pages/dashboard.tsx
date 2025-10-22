@@ -403,7 +403,7 @@ export default function Dashboard() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2 }}
       >
-        <Card className="glass-morphism" data-testid="card-total-rickshaws">
+        <Card className="glass-morphism" data-testid="card-total-airbears">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg flex items-center">
               <RickshawWheel size="sm" className="mr-2" />
@@ -412,9 +412,9 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-primary mb-2">
-              {analytics?.totalRickshaws || 0}
+              {analytics?.totalAirbears || 0}
             </div>
-            <p className="text-sm text-muted-foreground">Active rickshaws</p>
+            <p className="text-sm text-muted-foreground">Active AirBears</p>
           </CardContent>
         </Card>
 
@@ -427,7 +427,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-green-500 mb-2">
-              {analytics?.activeRickshaws || 0}
+              {analytics?.activeAirbears || 0}
             </div>
             <p className="text-sm text-muted-foreground">Currently in service</p>
           </CardContent>

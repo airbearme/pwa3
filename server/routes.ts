@@ -347,19 +347,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/analytics/overview", async (req, res) => {
     try {
       const spots = await storage.getAllSpots();
-      const rickshaws = await storage.getAllRickshaws();
-      const activeRickshaws = rickshaws.filter(r => r.isAvailable && !r.isCharging);
-      const chargingRickshaws = rickshaws.filter(r => r.isCharging);
-      const maintenanceRickshaws = rickshaws.filter(r => r.maintenanceStatus !== "good");
+      const airbears = await storage.getAllAirbears();
+      const activeAirbears = airbears.filter(a => a.isAvailable && !a.isCharging);
+      const chargingAirbears = airbears.filter(a => a.isCharging);
+      const maintenanceAirbears = airbears.filter(a => a.maintenanceStatus !== "good");
 
       const analytics = {
         totalSpots: spots.length,
-        totalRickshaws: rickshaws.length,
-        activeRickshaws: activeRickshaws.length,
-        chargingRickshaws: chargingRickshaws.length,
-        maintenanceRickshaws: maintenanceRickshaws.length,
-        averageBatteryLevel: rickshaws.length > 0 
-          ? Math.round(rickshaws.reduce((sum, r) => sum + r.batteryLevel, 0) / rickshaws.length)
+        totalAirbears: airbears.length,
+        activeAirbears: activeAirbears.length,
+        chargingAirbears: chargingAirbears.length,
+        maintenanceAirbears: maintenanceAirbears.length,
+        averageBatteryLevel: airbears.length > 0
+          ? Math.round(airbears.reduce((sum, a) => sum + a.batteryLevel, 0) / airbears.length)
           : 0
       };
 

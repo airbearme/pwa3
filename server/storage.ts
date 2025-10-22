@@ -159,9 +159,9 @@ export class MemStorage implements IStorage {
 
     // Initialize sample users with different roles
     const sampleUsers = [
-      { email: "user@example.com", username: "testuser", fullName: "Test User", role: "user", ecoPoints: 50, totalRides: 5, co2Saved: "2.5" },
-      { email: "driver@example.com", username: "testdriver", fullName: "Test Driver", role: "driver", ecoPoints: 200, totalRides: 45, co2Saved: "18.7" },
-      { email: "admin@example.com", username: "admin", fullName: "System Admin", role: "admin", ecoPoints: 0, totalRides: 0, co2Saved: "0" }
+      { email: "user@example.com", username: "testuser", fullName: "Test User", role: "user", ecoPoints: 50, totalRides: 5, co2Saved: "2.5", hasCeoTshirt: false, tshirtPurchaseDate: null },
+      { email: "driver@example.com", username: "testdriver", fullName: "Test Driver", role: "driver", ecoPoints: 200, totalRides: 45, co2Saved: "18.7", hasCeoTshirt: true, tshirtPurchaseDate: new Date() },
+      { email: "admin@example.com", username: "admin", fullName: "System Admin", role: "admin", ecoPoints: 0, totalRides: 0, co2Saved: "0", hasCeoTshirt: false, tshirtPurchaseDate: null }
     ];
 
     sampleUsers.forEach(userData => {
@@ -197,6 +197,8 @@ export class MemStorage implements IStorage {
       ecoPoints: insertUser.ecoPoints || 0,
       totalRides: insertUser.totalRides || 0,
       co2Saved: insertUser.co2Saved || "0",
+      hasCeoTshirt: insertUser.hasCeoTshirt || false,
+      tshirtPurchaseDate: insertUser.tshirtPurchaseDate || null,
       role: insertUser.role || "user",
       createdAt: new Date(),
       updatedAt: new Date()
@@ -309,6 +311,7 @@ export class MemStorage implements IStorage {
       actualDuration: insertRide.actualDuration || null,
       distance: insertRide.distance || null,
       co2Saved: insertRide.co2Saved || null,
+      isFreeTshirtRide: insertRide.isFreeTshirtRide || false,
       fare: insertRide.fare,
       requestedAt: new Date(),
       acceptedAt: null,
