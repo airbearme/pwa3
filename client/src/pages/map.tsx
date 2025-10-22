@@ -30,8 +30,8 @@ declare global {
 interface Spot {
   id: string;
   name: string;
-  latitude: string;
-  longitude: string;
+  latitude: number;
+  longitude: number;
   isActive: boolean;
 }
 
@@ -271,7 +271,7 @@ export default function Map() {
       });
 
       const marker = window.L.marker(
-        [parseFloat(spot.latitude), parseFloat(spot.longitude)], 
+        [spot.latitude, spot.longitude], 
         { icon: customIcon }
       ).addTo(map);
 
@@ -339,7 +339,7 @@ export default function Map() {
       userId: user.id,
       pickupSpotId: selectedSpot.id,
       destinationSpotId: selectedDestination.id,
-      fare: 15.00, // Base fare
+      fare: estimateRideFare(getRouteDistance(selectedSpot.id, selectedDestination.id) || 0),
     };
 
     bookRideMutation.mutate(rideData);
@@ -641,22 +641,31 @@ export default function Map() {
               {/* Ride Summary */}
               {selectedDestination && (
                 <div className="p-4 bg-muted/10 rounded-lg space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Base Fare</span>
-                    <span>$15.00</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Distance</span>
-                    <span>~2.3 km</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Est. Time</span>
-                    <span>8-12 min</span>
-                  </div>
-                  <div className="border-t pt-2 flex justify-between font-medium">
-                    <span>Total</span>
-                    <span>$15.00</span>
-                  </div>
+                  {(() => {
+                    const distance = getRouteDistance(selectedSpot.id, selectedDestination.id);
+                    const time = distance ? estimateRideTime(distance) : 0;
+                    const fare = distance ? estimateRideFare(distance) : 0;
+                    return (
+                      <>
+                        <div className="flex justify-between text-sm">
+                          <span>Distance</span>
+                          <span>{distance ? `${distance.toFixed(1)} km` : "N/A"}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Est. Time</span>
+                          <span>{time ? `${time} min` : "N/A"}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Fare</span>
+                          <span>${fare.toFixed(2)}</span>
+                        </div>
+                        <div className="border-t pt-2 flex justify-between font-medium">
+                          <span>Total</span>
+                          <span>${fare.toFixed(2)}</span>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
               )}
 
