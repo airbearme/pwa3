@@ -9,6 +9,16 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader2, Crown } from "lucide-react";
 import { useState } from "react";
 
+// Types for API responses
+type Analytics = {
+  totalSpots: number;
+  totalRickshaws: number;
+  activeRickshaws: number;
+  chargingRickshaws: number;
+  maintenanceRickshaws: number;
+  averageBatteryLevel: number;
+};
+
 export default function Home() {
   const [showCeoPromo, setShowCeoPromo] = useState(false);
   
@@ -16,7 +26,7 @@ export default function Home() {
     queryKey: ["/api/spots"],
   });
 
-  const { data: analytics } = useQuery({
+  const { data: analytics } = useQuery<Analytics>({
     queryKey: ["/api/analytics/overview"],
   });
 
@@ -160,7 +170,7 @@ export default function Home() {
           >
             <div className="text-center hover-lift" data-testid="stat-rides">
               <div className="text-2xl sm:text-3xl font-bold text-primary">
-                {analytics?.totalAirbears || 5}
+                {analytics?.totalRickshaws || 5}
               </div>
               <div className="text-sm text-muted-foreground">Active AirBears</div>
             </div>
