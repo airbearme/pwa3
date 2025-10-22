@@ -5,10 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import RickshawWheel from "@/components/airbear-wheel";
 import LoadingSpinner from "@/components/loading-spinner";
-import { spots } from "@/lib/spots";
+import { spots, getRouteDistance, estimateRideFare, estimateRideTime } from "@/lib/spots";
+import { apiRequest } from "@/lib/queryClient";
 import { 
   MapPin, 
   Navigation, 
@@ -188,9 +191,10 @@ export default function Map() {
     });
 
     // Add spot markers
-    spotsData.forEach((spot: Spot) => {
+    spotsData.forEach((spot: Spot, index: number) => {
       const availableAirbears = rickshaws.filter(r => r.currentSpotId === spot.id);
       const hasAirbears = availableAirbears.length > 0;
+      const spotNumber = index + 1; // Number from 1 to 16
       
       // Create custom AirBear icon with enhanced special effects
       const iconHtml = `
@@ -246,6 +250,12 @@ export default function Map() {
             </div>
           ` : ''}
           
+          <!-- Spot number -->
+          <div class="absolute -bottom-2 -left-2 w-6 h-6 bg-primary text-white rounded-full 
+                      flex items-center justify-center text-xs font-bold shadow-lg border-2 border-white">
+            ${spotNumber}
+          </div>
+          
           <!-- Enhanced location label with effects -->
           <div class="absolute -bottom-10 left-1/2 transform -translate-x-1/2 text-xs font-bold text-emerald-800 
                       bg-gradient-to-r from-white via-emerald-50 to-white px-3 py-2 rounded-full shadow-lg whitespace-nowrap
@@ -279,6 +289,9 @@ export default function Map() {
       const popupContent = `
         <div class="p-4 min-w-[250px] bg-white rounded-lg">
           <div class="flex items-center mb-3">
+            <div class="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">
+              ${spotNumber}
+            </div>
             <span class="text-2xl mr-2">🐻</span>
             <h3 class="font-bold text-lg text-emerald-700">${spot.name}</h3>
           </div>
