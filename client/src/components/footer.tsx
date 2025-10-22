@@ -34,6 +34,10 @@ export default function Footer() {
                 src="/airbear-mascot.png" 
                 alt="AirBear mascot" 
                 className="w-10 h-10 rounded-full object-cover border-2 border-white" 
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  console.warn('AirBear mascot image failed to load in footer');
+                }}
               />
               <div>
                 <h3 className="text-2xl font-bold">AirBear</h3>
@@ -199,10 +203,14 @@ export default function Footer() {
               <span className="font-semibold">"Glide with AirBear, eco-rides so rare!"</span>
               <div className="flex items-center space-x-2">
                 <span className="text-xs">Powered by</span>
-                <img 
-                  src="/airbear-mascot.png" 
-                  alt="AirBear mascot" 
-                  className="w-6 h-6 rounded-full object-cover border border-emerald-200 animate-spin-slow hover:animate-bounce" 
+                <img
+                  src="/airbear-mascot.png"
+                  alt="AirBear mascot"
+                  className="w-6 h-6 rounded-full object-cover border border-emerald-200 animate-spin-slow hover:animate-bounce"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    console.warn('AirBear mascot image failed to load in footer bottom');
+                  }}
                 />
                 <span className="text-xs font-semibold">Solar Energy</span>
               </div>

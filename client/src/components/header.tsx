@@ -52,10 +52,14 @@ export default function Header() {
               whileTap={{ scale: 0.95 }}
               data-testid="link-logo"
             >
-              <img 
-                src="/airbear-mascot.png" 
-                alt="AirBear mascot" 
-                className="w-10 h-10 rounded-full object-cover animate-neon-glow" 
+              <img
+                src="/airbear-mascot.png"
+                alt="AirBear mascot"
+                className="w-10 h-10 rounded-full object-cover animate-neon-glow"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  console.warn('AirBear mascot image failed to load');
+                }}
               />
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 via-lime-500 to-amber-500 bg-clip-text text-transparent">
