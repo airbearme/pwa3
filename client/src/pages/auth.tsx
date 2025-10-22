@@ -25,6 +25,7 @@ export default function Auth() {
     password: "",
     confirmPassword: "",
     username: "",
+    role: "user" as "user" | "driver" | "admin",
   });
 
   useEffect(() => {
@@ -58,6 +59,7 @@ export default function Auth() {
           email: formData.email,
           username: formData.username,
           password: formData.password,
+          role: formData.role,
         });
         
         // Trigger confetti animation
@@ -335,6 +337,49 @@ export default function Auth() {
                     className="focus:ring-primary"
                     data-testid="input-confirm-password"
                   />
+                </motion.div>
+              )}
+
+              {mode === "signup" && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="space-y-2"
+                >
+                  <Label className="flex items-center">
+                    <User className="w-4 h-4 mr-2" />
+                    Account Type
+                  </Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <Button
+                      type="button"
+                      variant={formData.role === "user" ? "default" : "outline"}
+                      onClick={() => handleInputChange("role", "user")}
+                      className="text-sm"
+                      data-testid="button-role-user"
+                    >
+                      User
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={formData.role === "driver" ? "default" : "outline"}
+                      onClick={() => handleInputChange("role", "driver")}
+                      className="text-sm"
+                      data-testid="button-role-driver"
+                    >
+                      Driver
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={formData.role === "admin" ? "default" : "outline"}
+                      onClick={() => handleInputChange("role", "admin")}
+                      className="text-sm"
+                      data-testid="button-role-admin"
+                    >
+                      Admin
+                    </Button>
+                  </div>
                 </motion.div>
               )}
 

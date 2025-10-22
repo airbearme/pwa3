@@ -18,7 +18,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (userData: { email: string; username: string; password: string }) => Promise<void>;
+  register: (userData: { email: string; username: string; password: string; role?: "user" | "driver" | "admin" }) => Promise<void>;
   loginWithOAuth: (provider: "google" | "apple") => Promise<void>;
   logout: () => void;
 }
