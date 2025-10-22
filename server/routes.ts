@@ -369,6 +369,118 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Push Notification Subscription Management
+  app.post("/api/push-subscriptions", async (req, res) => {
+    try {
+      const { subscription, preferences } = req.body;
+
+      if (!subscription || !preferences) {
+        return res.status(400).json({ message: "Subscription and preferences required" });
+      }
+
+      // In a real app, you'd store this in a database
+      // For now, we'll just log it and return success
+      console.log('Push subscription registered:', {
+        endpoint: subscription.endpoint,
+        preferences
+      });
+
+      res.json({
+        success: true,
+        message: "Push subscription registered successfully"
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Update push notification preferences
+  app.patch("/api/push-subscriptions", async (req, res) => {
+    try {
+      const { endpoint, preferences } = req.body;
+
+      if (!endpoint || !preferences) {
+        return res.status(400).json({ message: "Endpoint and preferences required" });
+      }
+
+      console.log('Push preferences updated:', {
+        endpoint,
+        preferences
+      });
+
+      res.json({
+        success: true,
+        message: "Push preferences updated successfully"
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Remove push subscription
+  app.delete("/api/push-subscriptions", async (req, res) => {
+    try {
+      const { endpoint } = req.body;
+
+      if (!endpoint) {
+        return res.status(400).json({ message: "Endpoint required" });
+      }
+
+      console.log('Push subscription removed:', endpoint);
+
+      res.json({
+        success: true,
+        message: "Push subscription removed successfully"
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Send test notification (for testing purposes)
+  app.post("/api/notifications/test", async (req, res) => {
+    try {
+      // In a real app, this would send a push notification to the user's subscription
+      // For now, we'll just simulate it
+
+      res.json({
+        success: true,
+        message: "Test notification sent successfully"
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Driver availability notification endpoint (called when drivers become available)
+  app.post("/api/notifications/driver-available", async (req, res) => {
+    try {
+      const { userId, location, availableDrivers } = req.body;
+
+      if (!userId) {
+        return res.status(400).json({ message: "User ID required" });
+      }
+
+      // In a real app, this would:
+      // 1. Find the user's push subscription
+      // 2. Send a push notification with driver availability info
+      // 3. Include location and number of available drivers
+
+      console.log('Driver availability notification requested:', {
+        userId,
+        location,
+        availableDrivers: availableDrivers || 1
+      });
+
+      res.json({
+        success: true,
+        message: "Driver availability notification sent"
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

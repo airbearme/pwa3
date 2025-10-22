@@ -5,9 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useAuth } from "@/hooks/use-auth";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { usePushNotifications } from "@/hooks/use-push-notifications";
 import RickshawWheel from "@/components/airbear-wheel";
 import LoadingSpinner from "@/components/loading-spinner";
 import { spots } from "@/lib/spots";
@@ -67,6 +65,43 @@ export default function Map() {
 
   // Calculate available AirBears count for map overlay
   const availableAirbearsCount = rickshaws?.filter(r => r.isAvailable).length || 0;
+
+  const {
+    isSubscribed,
+    preferences
+  } = usePushNotifications();
+
+  // Monitor driver availability and send notifications when drivers become available
+  useEffect(() => {
+    if (!user || !isSubscribed || !preferences.driverAvailability) return;
+
+    let lastAvailableCount = availableAirbearsCount;
+
+    const checkForNewDrivers = () => {
+      if (availableAirbearsCount > lastAvailableCount && availableAirbearsCount > 0) {
+        // Drivers became available - send notification
+        fetch('/api/notifications/driver-available', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: user.id,
+            location: 'nearby',
+            availableDrivers: availableAirbearsCount
+          })
+        }).catch(error => {
+          console.error('Error sending driver availability notification:', error);
+        });
+      }
+      lastAvailableCount = availableAirbearsCount;
+    };
+
+    // Check every 30 seconds for new drivers
+    const interval = setInterval(checkForNewDrivers, 30000);
+
+    return () => clearInterval(interval);
+  }, [user, isSubscribed, preferences.driverAvailability, availableAirbearsCount]);
 
   const bookRideMutation = useMutation({
     mutationFn: async (rideData: any) => {

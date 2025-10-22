@@ -21,7 +21,7 @@ import {
   Target,
   Calendar
 } from "lucide-react";
-import { Link } from "wouter";
+import NotificationSettings from "@/components/notification-settings";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -281,6 +281,15 @@ export default function Dashboard() {
             )}
           </CardContent>
         </Card>
+      </motion.div>
+
+      {/* Notification Settings */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.8 }}
+      >
+        <NotificationSettings />
       </motion.div>
     </div>
   );
