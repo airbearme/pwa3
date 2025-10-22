@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Spot, type InsertSpot, type Rickshaw, type InsertRickshaw, type Ride, type InsertRide, type BodegaItem, type InsertBodegaItem, type Order, type InsertOrder, type Payment, type InsertPayment } from "@shared/schema";
+import { type User, type InsertUser, type Spot, type InsertSpot, type Airbear, type InsertAirbear, type Ride, type InsertRide, type BodegaItem, type InsertBodegaItem, type Order, type InsertOrder, type Payment, type InsertPayment } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -17,11 +17,11 @@ export interface IStorage {
   getSpotById(id: string): Promise<Spot | undefined>;
 
   // Airbears (renamed from Rickshaws)
-  getAllAirbears(): Promise<any[]>;
-  getAvailableAirbears(): Promise<any[]>;
-  getAirbearsByDriver(driverId: string): Promise<any[]>;
-  createAirbear(airbear: any): Promise<any>;
-  updateAirbear(id: string, updates: Partial<any>): Promise<any>;
+  getAllAirbears(): Promise<Airbear[]>;
+  getAvailableAirbears(): Promise<Airbear[]>;
+  getAirbearsByDriver(driverId: string): Promise<Airbear[]>;
+  createAirbear(airbear: InsertAirbear): Promise<Airbear>;
+  updateAirbear(id: string, updates: Partial<Airbear>): Promise<Airbear>;
   
   // Legacy rickshaw methods for compatibility
   getAllRickshaws(): Promise<any[]>;
@@ -54,7 +54,7 @@ export interface IStorage {
 export class MemStorage implements IStorage {
   private users: Map<string, User> = new Map();
   private spots: Map<string, Spot> = new Map();
-  private airbears: Map<string, Rickshaw> = new Map();
+  private airbears: Map<string, Airbear> = new Map();
   private rides: Map<string, Ride> = new Map();
   private bodegaItems: Map<string, BodegaItem> = new Map();
   private orders: Map<string, Order> = new Map();
@@ -97,16 +97,40 @@ export class MemStorage implements IStorage {
       this.spots.set(spot.id, spot);
     });
 
+    // Initialize sample airbears (using first 5 created spots)
+    const createdSpots = Array.from(this.spots.values()).slice(0, 5);
+    const airbearsData = [
+      { driverId: null, currentSpotId: createdSpots[0]?.id || null, batteryLevel: 85, isAvailable: true, isCharging: false, totalDistance: "125.5", maintenanceStatus: "good" },
+      { driverId: null, currentSpotId: createdSpots[1]?.id || null, batteryLevel: 92, isAvailable: true, isCharging: false, totalDistance: "89.2", maintenanceStatus: "good" },
+      { driverId: null, currentSpotId: createdSpots[2]?.id || null, batteryLevel: 78, isAvailable: false, isCharging: true, totalDistance: "156.8", maintenanceStatus: "good" },
+      { driverId: null, currentSpotId: createdSpots[3]?.id || null, batteryLevel: 95, isAvailable: true, isCharging: false, totalDistance: "67.3", maintenanceStatus: "good" },
+      { driverId: null, currentSpotId: createdSpots[4]?.id || null, batteryLevel: 45, isAvailable: false, isCharging: false, totalDistance: "203.1", maintenanceStatus: "maintenance" }
+    ];
+
+    airbearsData.forEach(airbearData => {
+      const airbear: Airbear = {
+        id: randomUUID(),
+        driverId: airbearData.driverId,
+        currentSpotId: airbearData.currentSpotId,
+        batteryLevel: airbearData.batteryLevel,
+        isAvailable: airbearData.isAvailable,
+        isCharging: airbearData.isCharging,
+        totalDistance: airbearData.totalDistance,
+        maintenanceStatus: airbearData.maintenanceStatus,
+        createdAt: new Date()
+      };
+      this.airbears.set(airbear.id, airbear);
+    });
+
     // Initialize sample bodega items
     const bodegaItemsData = [
-      // CEO T-shirts (100 units total)
-      { name: "CEO-Signed AirBear T-Shirt - Size XS", description: "Authentic CEO-signed organic cotton t-shirt with unlimited daily rides for life. Non-transferable premium membership.", price: "100.00", category: "apparel", isEcoFriendly: true, isCeoSpecial: true, stock: 10 },
-      { name: "CEO-Signed AirBear T-Shirt - Size S", description: "Authentic CEO-signed organic cotton t-shirt with unlimited daily rides for life. Non-transferable premium membership.", price: "100.00", category: "apparel", isEcoFriendly: true, isCeoSpecial: true, stock: 15 },
-      { name: "CEO-Signed AirBear T-Shirt - Size M", description: "Authentic CEO-signed organic cotton t-shirt with unlimited daily rides for life. Non-transferable premium membership.", price: "100.00", category: "apparel", isEcoFriendly: true, isCeoSpecial: true, stock: 25 },
-      { name: "CEO-Signed AirBear T-Shirt - Size L", description: "Authentic CEO-signed organic cotton t-shirt with unlimited daily rides for life. Non-transferable premium membership.", price: "100.00", category: "apparel", isEcoFriendly: true, isCeoSpecial: true, stock: 25 },
-      { name: "CEO-Signed AirBear T-Shirt - Size XL", description: "Authentic CEO-signed organic cotton t-shirt with unlimited daily rides for life. Non-transferable premium membership.", price: "100.00", category: "apparel", isEcoFriendly: true, isCeoSpecial: true, stock: 15 },
-      { name: "CEO-Signed AirBear T-Shirt - Size XXL", description: "Authentic CEO-signed organic cotton t-shirt with unlimited daily rides for life. Non-transferable premium membership.", price: "100.00", category: "apparel", isEcoFriendly: true, isCeoSpecial: true, stock: 10 },
-      
+      { name: "CEO-Signed AirBear T-Shirt - Size XS", description: "Authentic CEO-signed organic cotton t-shirt with unlimited daily rides for life. Non-transferable premium membership.", price: "100.00", category: "apparel", isEcoFriendly: true, stock: 10 },
+      { name: "CEO-Signed AirBear T-Shirt - Size S", description: "Authentic CEO-signed organic cotton t-shirt with unlimited daily rides for life. Non-transferable premium membership.", price: "100.00", category: "apparel", isEcoFriendly: true, stock: 15 },
+      { name: "CEO-Signed AirBear T-Shirt - Size M", description: "Authentic CEO-signed organic cotton t-shirt with unlimited daily rides for life. Non-transferable premium membership.", price: "100.00", category: "apparel", isEcoFriendly: true, stock: 25 },
+      { name: "CEO-Signed AirBear T-Shirt - Size L", description: "Authentic CEO-signed organic cotton t-shirt with unlimited daily rides for life. Non-transferable premium membership.", price: "100.00", category: "apparel", isEcoFriendly: true, stock: 25 },
+      { name: "CEO-Signed AirBear T-Shirt - Size XL", description: "Authentic CEO-signed organic cotton t-shirt with unlimited daily rides for life. Non-transferable premium membership.", price: "100.00", category: "apparel", isEcoFriendly: true, stock: 15 },
+      { name: "CEO-Signed AirBear T-Shirt - Size XXL", description: "Authentic CEO-signed organic cotton t-shirt with unlimited daily rides for life. Non-transferable premium membership.", price: "100.00", category: "apparel", isEcoFriendly: true, stock: 10 },
+
       // Regular bodega items
       { name: "Local Coffee Blend", description: "Binghamton roasted, eco-friendly packaging", price: "12.99", category: "beverages", isEcoFriendly: true, stock: 20 },
       { name: "Fresh Produce Box", description: "Locally sourced, seasonal selection", price: "24.99", category: "food", isEcoFriendly: true, stock: 15 },
@@ -127,15 +151,33 @@ export class MemStorage implements IStorage {
         category: itemData.category,
         isEcoFriendly: itemData.isEcoFriendly,
         isAvailable: true,
-        isCeoSpecial: itemData.isCeoSpecial || false,
         stock: itemData.stock,
         createdAt: new Date()
       };
       this.bodegaItems.set(item.id, item);
     });
-  }
 
-  // Users
+    // Initialize sample users with different roles
+    const sampleUsers = [
+      { email: "user@example.com", username: "testuser", fullName: "Test User", role: "user", ecoPoints: 50, totalRides: 5, co2Saved: "2.5" },
+      { email: "driver@example.com", username: "testdriver", fullName: "Test Driver", role: "driver", ecoPoints: 200, totalRides: 45, co2Saved: "18.7" },
+      { email: "admin@example.com", username: "admin", fullName: "System Admin", role: "admin", ecoPoints: 0, totalRides: 0, co2Saved: "0" }
+    ];
+
+    sampleUsers.forEach(userData => {
+      const user: User = {
+        ...userData,
+        id: randomUUID(),
+        avatarUrl: null,
+        stripeCustomerId: null,
+        stripeSubscriptionId: null,
+        role: userData.role as "user" | "driver" | "admin",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      this.users.set(user.id, user);
+    });
+  }
   async getUser(id: string): Promise<User | undefined> {
     return this.users.get(id);
   }
@@ -148,6 +190,14 @@ export class MemStorage implements IStorage {
     const user: User = {
       ...insertUser,
       id: randomUUID(),
+      fullName: insertUser.fullName || null,
+      avatarUrl: insertUser.avatarUrl || null,
+      stripeCustomerId: insertUser.stripeCustomerId || null,
+      stripeSubscriptionId: insertUser.stripeSubscriptionId || null,
+      ecoPoints: insertUser.ecoPoints || 0,
+      totalRides: insertUser.totalRides || 0,
+      co2Saved: insertUser.co2Saved || "0",
+      role: insertUser.role || "user",
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -179,6 +229,9 @@ export class MemStorage implements IStorage {
     const spot: Spot = {
       ...insertSpot,
       id: randomUUID(),
+      latitude: insertSpot.latitude,
+      longitude: insertSpot.longitude,
+      isActive: insertSpot.isActive ?? true,
       createdAt: new Date()
     };
     this.spots.set(spot.id, spot);
@@ -190,29 +243,36 @@ export class MemStorage implements IStorage {
   }
 
   // Airbears (renamed from Rickshaws)
-  async getAllAirbears(): Promise<Rickshaw[]> {
+  async getAllAirbears(): Promise<Airbear[]> {
     return Array.from(this.airbears.values());
   }
 
-  async getAvailableAirbears(): Promise<Rickshaw[]> {
+  async getAvailableAirbears(): Promise<Airbear[]> {
     return Array.from(this.airbears.values()).filter(r => r.isAvailable && !r.isCharging);
   }
 
-  async getAirbearsByDriver(driverId: string): Promise<Rickshaw[]> {
+  async getAirbearsByDriver(driverId: string): Promise<Airbear[]> {
     return Array.from(this.airbears.values()).filter(r => r.driverId === driverId);
   }
 
-  async createAirbear(insertAirbear: InsertRickshaw): Promise<Rickshaw> {
-    const airbear: Rickshaw = {
+  async createAirbear(insertAirbear: InsertAirbear): Promise<Airbear> {
+    const airbear: Airbear = {
       ...insertAirbear,
       id: randomUUID(),
+      driverId: insertAirbear.driverId || null,
+      currentSpotId: insertAirbear.currentSpotId || null,
+      batteryLevel: insertAirbear.batteryLevel || 100,
+      isAvailable: insertAirbear.isAvailable ?? true,
+      isCharging: insertAirbear.isCharging ?? false,
+      totalDistance: insertAirbear.totalDistance || "0",
+      maintenanceStatus: insertAirbear.maintenanceStatus || "good",
       createdAt: new Date()
     };
     this.airbears.set(airbear.id, airbear);
     return airbear;
   }
 
-  async updateAirbear(id: string, updates: Partial<any>): Promise<any> {
+  async updateAirbear(id: string, updates: Partial<Airbear>): Promise<Airbear> {
     const airbear = this.airbears.get(id);
     if (!airbear) throw new Error("Airbear not found");
     const updatedAirbear = { ...airbear, ...updates };
@@ -242,6 +302,14 @@ export class MemStorage implements IStorage {
     const ride: Ride = {
       ...insertRide,
       id: randomUUID(),
+      driverId: insertRide.driverId || null,
+      airbearId: insertRide.airbearId || null,
+      status: insertRide.status || "pending",
+      estimatedDuration: insertRide.estimatedDuration || null,
+      actualDuration: insertRide.actualDuration || null,
+      distance: insertRide.distance || null,
+      co2Saved: insertRide.co2Saved || null,
+      fare: insertRide.fare,
       requestedAt: new Date(),
       acceptedAt: null,
       startedAt: null,
@@ -276,6 +344,11 @@ export class MemStorage implements IStorage {
     const item: BodegaItem = {
       ...insertItem,
       id: randomUUID(),
+      description: insertItem.description || null,
+      imageUrl: insertItem.imageUrl || null,
+      isEcoFriendly: insertItem.isEcoFriendly || false,
+      isAvailable: insertItem.isAvailable ?? true,
+      stock: insertItem.stock || 0,
       createdAt: new Date()
     };
     this.bodegaItems.set(item.id, item);
@@ -299,6 +372,10 @@ export class MemStorage implements IStorage {
     const order: Order = {
       ...insertOrder,
       id: randomUUID(),
+      rideId: insertOrder.rideId || null,
+      airbearId: insertOrder.airbearId || null,
+      status: insertOrder.status || "pending",
+      notes: insertOrder.notes || null,
       createdAt: new Date()
     };
     this.orders.set(order.id, order);
@@ -322,6 +399,12 @@ export class MemStorage implements IStorage {
     const payment: Payment = {
       ...insertPayment,
       id: randomUUID(),
+      orderId: insertPayment.orderId || null,
+      rideId: insertPayment.rideId || null,
+      stripePaymentIntentId: insertPayment.stripePaymentIntentId || null,
+      currency: insertPayment.currency || "usd",
+      status: insertPayment.status || "pending",
+      metadata: insertPayment.metadata || null,
       createdAt: new Date()
     };
     this.payments.set(payment.id, payment);
