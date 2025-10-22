@@ -18,6 +18,8 @@ import Support from "@/pages/support";
 import Safety from "@/pages/safety";
 import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
+import Challenges from "@/pages/challenges";
+import Rewards from "@/pages/rewards";
 import NotFound from "@/pages/not-found";
 
 // Components
@@ -39,6 +41,8 @@ function Router() {
           <Route path="/map" component={Map} />
           <Route path="/bodega" component={Bodega} />
           <Route path="/checkout" component={Checkout} />
+          <Route path="/challenges" component={Challenges} />
+          <Route path="/rewards" component={Rewards} />
           <Route path="/promo" component={Promo} />
           <Route path="/support" component={Support} />
           <Route path="/safety" component={Safety} />

@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
-import { Moon, Sun, Menu, User, Settings, LogOut } from "lucide-react";
+import { Moon, Sun, Menu, User, Settings, LogOut, Award, Gift } from "lucide-react";
 import { useTheme } from "next-themes";
 import RickshawWheel from "@/components/airbear-wheel";
 import { useAuth } from "@/hooks/use-auth";
@@ -25,6 +25,8 @@ export default function Header() {
   const navigation = [
     { name: "Rides", href: "/map", icon: "fas fa-map" },
     { name: "Bodega", href: "/bodega", icon: "fas fa-store" },
+    { name: "Challenges", href: "/challenges", icon: "fas fa-trophy" },
+    { name: "Rewards", href: "/rewards", icon: "fas fa-gift" },
     { name: "Impact", href: "/", icon: "fas fa-leaf", scrollTo: "eco" },
   ];
 
@@ -139,6 +141,18 @@ export default function Header() {
                     <DropdownMenuItem className="cursor-pointer" data-testid="menu-dashboard">
                       <User className="mr-2 h-4 w-4" />
                       Dashboard
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link to="/challenges">
+                    <DropdownMenuItem className="cursor-pointer" data-testid="menu-challenges">
+                      <Award className="mr-2 h-4 w-4" />
+                      Eco Challenges
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link to="/rewards">
+                    <DropdownMenuItem className="cursor-pointer" data-testid="menu-rewards">
+                      <Gift className="mr-2 h-4 w-4" />
+                      Rewards
                     </DropdownMenuItem>
                   </Link>
                   <DropdownMenuItem 
@@ -280,6 +294,30 @@ export default function Header() {
                         >
                           <User className="mr-2 h-4 w-4" />
                           Dashboard
+                        </Button>
+                      </Link>
+
+                      <Link to="/challenges">
+                        <Button 
+                          variant="ghost" 
+                          className="w-full justify-start"
+                          onClick={() => setMobileMenuOpen(false)}
+                          data-testid="mobile-button-challenges"
+                        >
+                          <Award className="mr-2 h-4 w-4" />
+                          Eco Challenges
+                        </Button>
+                      </Link>
+
+                      <Link to="/rewards">
+                        <Button 
+                          variant="ghost" 
+                          className="w-full justify-start"
+                          onClick={() => setMobileMenuOpen(false)}
+                          data-testid="mobile-button-rewards"
+                        >
+                          <Gift className="mr-2 h-4 w-4" />
+                          Rewards
                         </Button>
                       </Link>
 

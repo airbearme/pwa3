@@ -140,33 +140,32 @@ export default function Dashboard() {
           </Card>
         </Link>
 
-        <Card 
-          className="hover-lift glass-morphism cursor-pointer group" 
-          data-testid="card-eco-challenges"
-          onClick={() => alert('Eco Challenges feature coming soon! Complete weekly missions to earn bonus eco points.')}
-        >
-          <CardContent className="p-6 text-center">
-            <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-green-500/20 transition-colors">
-              <Target className="h-8 w-8 text-green-500" />
-            </div>
-            <h3 className="font-semibold mb-2">Eco Challenges</h3>
-            <p className="text-sm text-muted-foreground">Weekly missions</p>
-          </CardContent>
-        </Card>
+        <Link to="/challenges">
+          <Card className="hover-lift glass-morphism cursor-pointer group" data-testid="card-eco-challenges">
+            <CardContent className="p-6 text-center">
+              <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-green-500/20 transition-colors">
+                <Target className="h-8 w-8 text-green-500" />
+              </div>
+              <h3 className="font-semibold mb-2">Eco Challenges</h3>
+              <p className="text-sm text-muted-foreground">Weekly missions</p>
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card 
-          className="hover-lift glass-morphism cursor-pointer group" 
-          data-testid="card-rewards"
-          onClick={() => alert('Rewards program coming soon! Redeem your eco points for exclusive prizes and discounts.')}
-        >
-          <CardContent className="p-6 text-center">
-            <div className="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-500/20 transition-colors">
-              <Award className="h-8 w-8 text-purple-500" />
-            </div>
-            <h3 className="font-semibold mb-2">Rewards</h3>
-            <p className="text-sm text-muted-foreground">Claim your prizes</p>
-          </CardContent>
-        </Card>
+        <Link to="/rewards">
+          <Card
+            className="hover-lift glass-morphism cursor-pointer group"
+            data-testid="card-rewards"
+          >
+            <CardContent className="p-6 text-center">
+              <div className="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-500/20 transition-colors">
+                <Award className="h-8 w-8 text-purple-500" />
+              </div>
+              <h3 className="font-semibold mb-2">Rewards</h3>
+              <p className="text-sm text-muted-foreground">Claim your prizes</p>
+            </CardContent>
+          </Card>
+        </Link>
       </motion.div>
 
       {/* Stats Grid */}
