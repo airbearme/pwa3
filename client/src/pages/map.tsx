@@ -65,6 +65,9 @@ export default function Map() {
     queryKey: ["/api/rickshaws/available"],
   });
 
+  // Calculate available AirBears count for map overlay
+  const availableAirbearsCount = rickshaws?.filter(r => r.isAvailable).length || 0;
+
   const bookRideMutation = useMutation({
     mutationFn: async (rideData: any) => {
       const response = await apiRequest("POST", "/api/rides", rideData);
@@ -333,70 +336,106 @@ export default function Map() {
           </p>
         </motion.div>
 
-        {/* Map Container */}
-        <motion.div 
-          className="bg-card rounded-2xl p-6 shadow-2xl glass-morphism mb-8"
+        {/* Booking Status Info */}
+        <motion.div
+          className="mb-6 p-4 bg-gradient-to-r from-emerald-50 to-lime-50 rounded-lg border border-emerald-200"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
+              <RickshawWheel size="sm" className="text-primary" />
+              <span className="font-semibold text-emerald-700">Ready to Book?</span>
+            </div>
+            <div className="hidden sm:flex items-center space-x-4 text-sm text-emerald-600">
+              <span>💡 Click any green marker to book a ride</span>
+              <span>⚡ Real-time availability updates</span>
+              <span>🌱 Carbon-neutral transportation</span>
+            </div>
+          </div>
+        </motion.div>
+        <motion.div
+          className="bg-card rounded-2xl p-6 shadow-2xl glass-morphism mb-8 relative overflow-hidden"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          <div className="aspect-video rounded-xl overflow-hidden relative">
+          {/* Decorative background elements */}
+          <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+            <div className="absolute top-4 left-4 w-32 h-32 bg-primary/5 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-4 right-4 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl animate-pulse" style={{animationDelay: '1s'}}></div>
+            <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-amber-500/5 rounded-full blur-xl animate-pulse" style={{animationDelay: '2s'}}></div>
+          </div>
+
+          <div className="aspect-video rounded-xl overflow-hidden relative shadow-inner">
             <div 
               ref={mapRef} 
               className="w-full h-full"
               data-testid="map-container"
             />
             
-            {/* Real-time Stats Overlay */}
-            <div className="absolute bottom-4 left-4 bg-card/90 backdrop-blur-sm rounded-lg p-4 shadow-lg">
-              <div className="flex items-center space-x-4 text-sm">
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                  <span>{availableAirbears.length} AirBears Available</span>
+            {/* Enhanced Real-time Stats Overlay */}
+            <div className="absolute bottom-4 left-4 bg-card/95 backdrop-blur-md rounded-xl p-4 shadow-xl border border-white/20">
+              <div className="flex items-center space-x-6 text-sm">
+                <div className="flex items-center space-x-3">
+                  <div className="w-4 h-4 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/50"></div>
+                  <div>
+                    <div className="font-semibold text-green-600">{availableAirbearsCount} AirBears</div>
+                    <div className="text-xs text-muted-foreground">Available</div>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-amber-500 rounded-full animate-pulse"></div>
-                  <span>{rickshaws?.filter(r => !r.isAvailable && !r.isCharging).length || 0} En Route</span>
+                <div className="flex items-center space-x-3">
+                  <div className="w-4 h-4 bg-amber-500 rounded-full animate-pulse shadow-lg shadow-amber-500/50"></div>
+                  <div>
+                    <div className="font-semibold text-amber-600">{rickshaws?.filter(r => !r.isAvailable && !r.isCharging).length || 0}</div>
+                    <div className="text-xs text-muted-foreground">En Route</div>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                  <span>{rickshaws?.filter(r => r.isCharging).length || 0} Charging</span>
+                <div className="flex items-center space-x-3">
+                  <div className="w-4 h-4 bg-blue-500 rounded-full shadow-lg shadow-blue-500/50"></div>
+                  <div>
+                    <div className="font-semibold text-blue-600">{rickshaws?.filter(r => r.isCharging).length || 0}</div>
+                    <div className="text-xs text-muted-foreground">Charging</div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Map Controls */}
-            <div className="absolute top-4 right-4 flex flex-col space-y-2">
-              <Button 
-                size="sm" 
-                variant="secondary" 
-                className="w-10 h-10 p-0" 
-                data-testid="button-zoom-in"
-                onClick={() => {
-                  if (mapInstanceRef.current) {
-                    mapInstanceRef.current.zoomIn();
-                  }
-                }}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-              <Button 
-                size="sm" 
-                variant="secondary" 
-                className="w-10 h-10 p-0" 
-                data-testid="button-zoom-out"
-                onClick={() => {
-                  if (mapInstanceRef.current) {
-                    mapInstanceRef.current.zoomOut();
-                  }
-                }}
-              >
-                <Minus className="h-4 w-4" />
-              </Button>
-              <Button 
-                size="sm" 
-                variant="secondary" 
-                className="w-10 h-10 p-0" 
+            {/* Enhanced Map Controls */}
+            <div className="absolute top-4 right-4 flex flex-col space-y-3">
+              <div className="bg-card/90 backdrop-blur-md rounded-lg p-2 shadow-xl border border-white/20">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="w-12 h-12 p-0 hover:bg-primary/10 transition-all duration-200"
+                  data-testid="button-zoom-in"
+                  onClick={() => {
+                    if (mapInstanceRef.current) {
+                      mapInstanceRef.current.zoomIn();
+                    }
+                  }}
+                >
+                  <Plus className="h-5 w-5" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="w-12 h-12 p-0 hover:bg-primary/10 transition-all duration-200"
+                  data-testid="button-zoom-out"
+                  onClick={() => {
+                    if (mapInstanceRef.current) {
+                      mapInstanceRef.current.zoomOut();
+                    }
+                  }}
+                >
+                  <Minus className="h-5 w-5" />
+                </Button>
+              </div>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="w-12 h-12 p-0 bg-card/90 backdrop-blur-md shadow-xl border border-white/20 hover:bg-primary/10 transition-all duration-200"
                 data-testid="button-center-map"
                 onClick={() => {
                   if (mapInstanceRef.current) {
@@ -404,24 +443,30 @@ export default function Map() {
                   }
                 }}
               >
-                <Navigation className="h-4 w-4" />
+                <Navigation className="h-5 w-5" />
               </Button>
             </div>
           </div>
 
-          {/* Map Legend */}
-          <div className="mt-6 flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center space-x-2">
-              <RickshawWheel size="sm" />
-              <span>Available AirBear</span>
+          {/* Enhanced Map Legend */}
+          <div className="mt-6 flex flex-wrap justify-center gap-6 text-sm">
+            <div className="flex items-center space-x-3 bg-card/50 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/10">
+              <div className="flex items-center space-x-2">
+                <RickshawWheel size="sm" className="text-primary" />
+                <span className="font-medium">Available AirBear</span>
+              </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Store className="h-4 w-4 text-amber-500" />
-              <span>Bodega Available</span>
+            <div className="flex items-center space-x-3 bg-card/50 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/10">
+              <div className="flex items-center space-x-2">
+                <Store className="h-5 w-5 text-amber-500" />
+                <span className="font-medium">Bodega Available</span>
+              </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Zap className="h-4 w-4 text-lime-500" />
-              <span>Solar Charging</span>
+            <div className="flex items-center space-x-3 bg-card/50 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/10">
+              <div className="flex items-center space-x-2">
+                <Zap className="h-5 w-5 text-lime-500" />
+                <span className="font-medium">Solar Charging</span>
+              </div>
             </div>
           </div>
         </motion.div>
