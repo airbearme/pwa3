@@ -1,7 +1,6 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -23,11 +22,20 @@ import {
 } from "lucide-react";
 import NotificationSettings from "@/components/notification-settings";
 
+interface Analytics {
+  totalSpots: number;
+  totalAirbears: number;
+  activeAirbears: number;
+  chargingAirbears: number;
+  maintenanceAirbears: number;
+  averageBatteryLevel: number;
+}
+
 export default function Dashboard() {
   const { user } = useAuth();
   const [activeView, setActiveView] = useState("overview");
 
-  const { data: rides, isLoading: ridesLoading } = useQuery({
+  const { data: rides, isLoading: ridesLoading } = useQuery<any[]>({
     queryKey: ["/api/rides/user", user?.id],
     enabled: !!user?.id,
   });
@@ -37,7 +45,7 @@ export default function Dashboard() {
     enabled: !!user?.id,
   });
 
-  const { data: analytics } = useQuery({
+  const { data: analytics } = useQuery<Analytics>({
     queryKey: ["/api/analytics/overview"],
   });
 
@@ -241,10 +249,10 @@ export default function Dashboard() {
           <CardContent>
             {ridesLoading ? (
               <LoadingSpinner size="sm" text="Loading activities..." />
-            ) : rides && rides.length > 0 ? (
+            ) : Array.isArray(rides) && rides.length > 0 ? (
               <div className="space-y-4">
                 {rides.slice(0, 5).map((ride: any, index: number) => (
-                  <motion.div 
+                  <motion.div
                     key={ride.id}
                     className="flex items-center justify-between p-3 bg-muted/20 rounded-lg"
                     initial={{ opacity: 0, x: -20 }}
