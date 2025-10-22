@@ -129,7 +129,31 @@ PORT=5000
 
 ## 🚀 Deployment Options
 
-### Replit Static Deployment (Recommended)
+### IONOS FTP Deployment
+1. **Set up Environment Variables**:
+   - Ensure your `.env` file includes IONOS FTP credentials:
+     ```env
+     IONOS_FTP_HOST=ftp.airbear.me
+     IONOS_FTP_USER=your_ftp_username
+     IONOS_FTP_PASSWORD=your_ftp_password
+     ```
+
+2. **Build and Deploy**:
+   ```bash
+   npm run deploy:ionos
+   ```
+
+   This script will:
+   - Build the production version
+   - Create a deployment package
+   - Upload to your IONOS FTP server
+   - Verify PWA features
+
+3. **Access Your Live App**:
+   - Visit `https://your-domain.com` (replace with your IONOS domain)
+   - The PWA will prompt for installation on mobile devices
+
+### Replit Static Deployment (Alternative)
 1. Open Deployments tab in Replit
 2. Select "Static" deployment type
 3. Configure:
