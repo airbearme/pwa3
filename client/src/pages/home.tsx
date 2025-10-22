@@ -52,7 +52,7 @@ export default function Home() {
             transition={{ duration: 0.8, type: "spring" }}
           >
             <img 
-              src="/airbear-mascot-original.png" 
+              src="/airbear-mascot.png" 
               alt="Friendly brown bear mascot with pilot goggles representing AirBear" 
               className="mx-auto rounded-full w-32 h-32 object-cover border-4 border-primary/30 hover-lift animate-pulse-glow"
               data-testid="img-mascot"
@@ -160,9 +160,9 @@ export default function Home() {
           >
             <div className="text-center hover-lift" data-testid="stat-rides">
               <div className="text-2xl sm:text-3xl font-bold text-primary">
-                {analytics?.totalRides || 0}
+                {analytics?.totalAirbears || 5}
               </div>
-              <div className="text-sm text-muted-foreground">Rides Completed</div>
+              <div className="text-sm text-muted-foreground">Active AirBears</div>
             </div>
             <div className="text-center hover-lift" data-testid="stat-co2">
               <div className="text-2xl sm:text-3xl font-bold text-lime-500">582kg</div>
@@ -173,7 +173,7 @@ export default function Home() {
                 {isLoading ? (
                   <Loader2 className="h-6 w-6 animate-spin mx-auto" />
                 ) : (
-                  spots?.length || 16
+                  analytics?.totalSpots || 16
                 )}
               </div>
               <div className="text-sm text-muted-foreground">Active Spots</div>
