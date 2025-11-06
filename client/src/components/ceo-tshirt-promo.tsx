@@ -230,7 +230,7 @@ export default function CeoTshirtPromo({ isOpen, onClose }: CeoTshirtPromoProps)
                 <Checkbox 
                   id="ceo-terms" 
                   checked={acceptedTerms}
-                  onCheckedChange={setAcceptedTerms}
+                  onCheckedChange={(checked) => setAcceptedTerms(checked === true)}
                 />
                 <label htmlFor="ceo-terms" className="text-sm cursor-pointer">
                   I agree to the{" "}
