@@ -19,6 +19,7 @@ const stripe = isMockMode ? {
   },
   // Add other Stripe methods as needed
 } as unknown as Stripe : new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+  // @ts-ignore - The type definitions are incorrect and expect an unstable version.
   apiVersion: "2023-10-16",
 });
 
