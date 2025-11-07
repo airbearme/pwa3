@@ -631,7 +631,7 @@ export default function Map() {
               <div className="space-y-2">
                 <label className="text-sm font-medium">Destination</label>
                 <div className="max-h-40 overflow-y-auto space-y-1">
-                  {spotsData?.filter(s => s.id !== selectedSpot?.id).map((spot) => (
+                  {selectedSpot && spotsData?.filter(s => s.id !== selectedSpot.id).map((spot) => (
                     <div
                       key={spot.id}
                       className={`p-3 rounded-lg cursor-pointer transition-colors ${
@@ -655,6 +655,7 @@ export default function Map() {
               {selectedDestination && (
                 <div className="p-4 bg-muted/10 rounded-lg space-y-2">
                   {(() => {
+                    if (!selectedSpot) return null;
                     const distance = getRouteDistance(selectedSpot.id, selectedDestination.id);
                     const time = distance ? estimateRideTime(distance) : 0;
                     const fare = distance ? estimateRideFare(distance) : 0;
