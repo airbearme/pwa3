@@ -655,7 +655,7 @@ export default function Map() {
               {selectedDestination && (
                 <div className="p-4 bg-muted/10 rounded-lg space-y-2">
                   {(() => {
-                    const distance = getRouteDistance(selectedSpot.id, selectedDestination.id);
+                    const distance = selectedSpot ? getRouteDistance(selectedSpot.id, selectedDestination.id) : null;
                     const time = distance ? estimateRideTime(distance) : 0;
                     const fare = distance ? estimateRideFare(distance) : 0;
                     return (
