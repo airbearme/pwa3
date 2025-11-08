@@ -10,8 +10,8 @@ interface Particle {
   color: string;
 }
 
-export default function ParticleSystem() {
-  const particles = useMemo(() => {
+function FloatingParticles() {
+  const particles = useMemo<Particle[]>(() => {
     const colors = ["#10b981", "#84cc16", "#f59e0b", "#22c55e"];
     return Array.from({ length: 20 }, (_, i) => ({
       id: i,
@@ -24,7 +24,7 @@ export default function ParticleSystem() {
   }, []);
 
   return (
-    <div className="particle-system fixed inset-0 z-0 pointer-events-none">
+    <>
       {particles.map((particle) => (
         <motion.div
           key={particle.id}
@@ -49,8 +49,13 @@ export default function ParticleSystem() {
           }}
         />
       ))}
-      
-      {/* Solar wind particles */}
+    </>
+  );
+}
+
+function SolarWindParticles() {
+  return (
+    <>
       {Array.from({ length: 8 }, (_, i) => (
         <motion.div
           key={`solar-${i}`}
@@ -72,6 +77,96 @@ export default function ParticleSystem() {
           }}
         />
       ))}
+    </>
+  );
+}
+
+function ShootingStars() {
+  const stars = useMemo(() => {
+    return Array.from({ length: 10 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      delay: Math.random() * 10,
+      duration: Math.random() * 2 + 1,
+    }));
+  }, []);
+
+  return (
+    <>
+      {stars.map((star) => (
+        <motion.div
+          key={`star-${star.id}`}
+          className="absolute h-1 w-20 bg-gradient-to-r from-white to-transparent"
+          style={{
+            left: '-20%',
+            top: `${star.y}%`,
+            transform: `rotate(-25deg)`
+          }}
+          animate={{
+            x: ['0%', '120vw'],
+          }}
+          transition={{
+            duration: star.duration,
+            repeat: Infinity,
+            delay: star.delay,
+            ease: "linear",
+          }}
+        />
+      ))}
+    </>
+  );
+}
+
+
+function GlowingEmbers() {
+  const embers = useMemo(() => {
+    return Array.from({ length: 15 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 5 + 2,
+      delay: Math.random() * 5,
+    }));
+  }, []);
+
+  return (
+    <>
+      {embers.map((ember) => (
+        <motion.div
+          key={`ember-${ember.id}`}
+          className="absolute rounded-full"
+          style={{
+            left: `${ember.x}%`,
+            top: `${ember.y}%`,
+            width: ember.size,
+            height: ember.size,
+            background: 'rgba(255, 165, 0, 0.8)',
+            boxShadow: '0 0 10px 5px rgba(255, 165, 0, 0.5)',
+          }}
+          animate={{
+            opacity: [0, 1, 0],
+            scale: [1, 1.5, 1],
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            delay: ember.delay,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+    </>
+  );
+}
+
+export default function ParticleSystem() {
+  return (
+    <div className="particle-system fixed inset-0 z-0 pointer-events-none">
+      <FloatingParticles />
+      <SolarWindParticles />
+      <ShootingStars />
+      <GlowingEmbers />
     </div>
   );
 }

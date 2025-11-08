@@ -227,10 +227,14 @@ export default function CeoTshirtPromo({ isOpen, onClose }: CeoTshirtPromoProps)
 
               {/* Terms Agreement */}
               <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="ceo-terms" 
+                <Checkbox
+                  id="ceo-terms"
                   checked={acceptedTerms}
-                  onCheckedChange={setAcceptedTerms}
+                  onCheckedChange={(checked) => {
+                    if (typeof checked === "boolean") {
+                      setAcceptedTerms(checked);
+                    }
+                  }}
                 />
                 <label htmlFor="ceo-terms" className="text-sm cursor-pointer">
                   I agree to the{" "}

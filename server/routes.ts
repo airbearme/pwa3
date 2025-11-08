@@ -19,7 +19,7 @@ const stripe = isMockMode ? {
   },
   // Add other Stripe methods as needed
 } as unknown as Stripe : new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: "2023-10-16",
+  apiVersion: "2025-10-29.clover",
 });
 
 if (isMockMode) {

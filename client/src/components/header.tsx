@@ -21,6 +21,7 @@ export default function Header() {
   const { theme, setTheme } = useTheme();
   const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
 
   const navigation = [
     { name: "Rides", href: "/map", icon: "fas fa-map" },
@@ -64,7 +65,7 @@ export default function Header() {
                 }}
               />
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 via-lime-500 to-amber-500 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 via-lime-500 to-amber-500 bg-clip-text text-transparent animate-glowing">
                   AirBear
                 </h1>
                 <p className="text-xs text-emerald-600 font-semibold animate-shimmer">Eco rides so rare!</p>
@@ -76,25 +77,40 @@ export default function Header() {
           <nav className="hidden md:flex items-center space-x-8">
             {navigation.map((item) => (
               <Link key={item.name} to={item.href}>
-                <motion.a
-                  className={`text-foreground/80 hover:text-primary transition-colors hover-lift flex items-center space-x-2 ${
-                    isActive(item.href) ? "text-primary font-medium" : ""
-                  }`}
-                  whileHover={{ y: -2 }}
-                  data-testid={`link-nav-${item.name.toLowerCase()}`}
-                  onClick={(e) => {
-                    if ('scrollTo' in item) {
-                      e.preventDefault();
-                      const element = document.getElementById((item as any).scrollTo);
-                      if (element) {
-                        element.scrollIntoView({ behavior: 'smooth' });
-                      }
-                    }
-                  }}
+                <motion.div
+                  className="relative"
+                  onHoverStart={() => setHoveredLink(item.name)}
+                  onHoverEnd={() => setHoveredLink(null)}
                 >
-                  <i className={`${item.icon} text-sm`}></i>
-                  <span>{item.name}</span>
-                </motion.a>
+                  <motion.a
+                    className={`text-foreground/80 hover:text-primary transition-colors hover-lift flex items-center space-x-2 ${
+                      isActive(item.href) ? "text-primary font-medium animate-breathing" : ""
+                    }`}
+                    whileHover={{ y: -2 }}
+                    data-testid={`link-nav-${item.name.toLowerCase()}`}
+                    onClick={(e) => {
+                      if ('scrollTo' in item) {
+                        e.preventDefault();
+                        const element = document.getElementById((item as any).scrollTo);
+                        if (element) {
+                          element.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }
+                    }}
+                  >
+                    <i className={`${item.icon} text-sm`}></i>
+                    <span>{item.name}</span>
+                  </motion.a>
+                  {hoveredLink === item.name && (
+                    <motion.div
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                      layoutId="underline"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    />
+                  )}
+                </motion.div>
               </Link>
             ))}
           </nav>

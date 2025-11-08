@@ -172,10 +172,14 @@ export default function Promo() {
               </div>
 
               <div className="flex items-center justify-center space-x-2 mb-6">
-                <Checkbox 
-                  id="terms" 
+                <Checkbox
+                  id="terms"
                   checked={acceptedTerms}
-                  onCheckedChange={setAcceptedTerms}
+                  onCheckedChange={(checked) => {
+                    if (typeof checked === "boolean") {
+                      setAcceptedTerms(checked);
+                    }
+                  }}
                 />
                 <label htmlFor="terms" className="text-sm cursor-pointer">
                   I agree to the{" "}
