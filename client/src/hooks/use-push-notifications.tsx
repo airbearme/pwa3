@@ -127,6 +127,7 @@ export const usePushNotifications = () => {
 
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
+        // @ts-ignore
         applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
       });
 

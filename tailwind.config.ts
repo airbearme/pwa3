@@ -227,6 +227,22 @@ export default {
             opacity: "0",
           },
         },
+        glowing: {
+          "0%": {
+            textShadow: "0 0 5px currentColor",
+          },
+          "100%": {
+            textShadow: "0 0 20px currentColor, 0 0 30px currentColor, 0 0 40px currentColor",
+          },
+        },
+        breathing: {
+          "0%, 100%": {
+            transform: "scale(1)",
+          },
+          "50%": {
+            transform: "scale(1.05)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
