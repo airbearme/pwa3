@@ -1,58 +1,50 @@
 import React from 'react';
 
-interface AirbearWheelProps {
+interface RickshawWheelProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
   glowing?: boolean;
   animated?: boolean;
-  effectType?: 'solar' | 'eco' | string;
+  effect?: 'fire' | 'neon' | 'holographic' | 'plasma' | 'solar';
 }
 
-export const AirbearWheel: React.FC<AirbearWheelProps> = ({
+const RickshawWheel: React.FC<RickshawWheelProps> = ({
   size = 'md',
   className = '',
   glowing = false,
   animated = false,
-  effectType
+  effect,
 }) => {
   const sizeClasses = {
-    sm: 'w-6 h-6',
-    md: 'w-10 h-10',
-    lg: 'w-14 h-14',
-    xl: 'w-20 h-20'
+    sm: 'w-8 h-8',
+    md: 'w-12 h-12',
+    lg: 'w-16 h-16',
+    xl: 'w-24 h-24',
   };
 
-  const glowClass = glowing ? 'shadow-lg shadow-primary/50' : '';
+  const effectClasses = {
+    fire: 'animate-rolling-fire',
+    neon: 'animate-neon-glow',
+    holographic: 'airbear-holographic',
+    plasma: 'airbear-plasma',
+    solar: 'airbear-solar-rays',
+  };
+
+  const animationClass = animated ? 'animate-spin-slow' : '';
+  const glowClass = glowing ? 'animate-pulse-glow' : '';
 
   return (
-    <div className={`airbear-wheel ${sizeClasses[size]} ${glowClass} ${className} relative`}>
-      <div className={`w-full h-full rounded-full bg-gradient-to-br from-primary/80 to-primary/40 border-2 border-primary/60 flex items-center justify-center ${animated ? 'animate-spin' : ''} opacity-80`}>
-        {/* Wheel spokes */}
-        {Array.from({ length: 8 }, (_, i) => (
-          <div
-            key={i}
-            className="absolute w-0.5 h-full bg-primary/70"
-            style={{
-              transform: `rotate(${i * 45}deg)`,
-              transformOrigin: 'center'
-            }}
-          />
-        ))}
-        {/* Center hub with AirBear face */}
-        <div className="w-2/3 h-2/3 rounded-full bg-gradient-to-br from-amber-200 to-amber-400 border border-primary/50 flex items-center justify-center relative">
-          <span className="text-xs font-bold text-primary">🐻</span>
-          {/* Mini wheel effect */}
-          <div className="absolute inset-1 rounded-full border border-primary/30 animate-pulse opacity-60"></div>
+    <div className={`relative ${sizeClasses[size]} ${className}`}>
+      <div className={`absolute inset-0 rounded-full ${effect ? effectClasses[effect] : ''}`}></div>
+      <div className={`relative w-full h-full rounded-full border-2 border-primary/50 flex items-center justify-center ${animationClass} ${glowClass}`}>
+        <div className="absolute w-full h-full rounded-full border-2 border-primary/30 transform rotate-45"></div>
+        <div className="w-1/2 h-1/2 rounded-full bg-primary/20 flex items-center justify-center text-2xl">
+          🐻
         </div>
-        {/* Transparent overlay for wheel look */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-transparent via-primary/10 to-transparent opacity-50"></div>
       </div>
-      {/* Glowing effect */}
-      {glowing && (
-        <div className="absolute inset-0 rounded-full bg-primary/20 blur-sm animate-pulse"></div>
-      )}
     </div>
   );
 };
 
-export default AirbearWheel;
+export const AirbearWheel = RickshawWheel;
+export default RickshawWheel;

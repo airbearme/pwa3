@@ -17,6 +17,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
+  isUserReady: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (userData: { email: string; username: string; password: string; role?: "user" | "driver" | "admin" }) => Promise<void>;
   loginWithOAuth: (provider: "google" | "apple") => Promise<void>;
@@ -28,14 +29,31 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUserReady, setIsUserReady] = useState(false);
   const { toast } = useToast();
+
+  const fetchUserData = async (userId: string) => {
+    try {
+      // Simulate fetching additional user data like rides and orders
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // In a real app, you would fetch the user's full profile
+      // and update the user state with the complete data.
+
+      setIsUserReady(true);
+    } catch (error) {
+      console.error("Failed to fetch user data:", error);
+    }
+  };
 
   // Check for existing session on mount
   useEffect(() => {
     const storedUser = localStorage.getItem("airbear-user");
     if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        fetchUserData(parsedUser.id);
       } catch (error) {
         localStorage.removeItem("airbear-user");
       }
@@ -44,12 +62,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
+    setIsUserReady(false);
     try {
       const response = await apiRequest("POST", "/api/auth/login", { email, password });
       const data = await response.json();
       
       setUser(data.user);
       localStorage.setItem("airbear-user", JSON.stringify(data.user));
+      await fetchUserData(data.user.id);
     } catch (error: any) {
       throw new Error(error.message || "Login failed");
     } finally {
@@ -59,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (userData: { email: string; username: string; password: string }) => {
     setIsLoading(true);
+    setIsUserReady(false);
     try {
       const response = await apiRequest("POST", "/api/auth/register", {
         ...userData,
@@ -71,6 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       setUser(data.user);
       localStorage.setItem("airbear-user", JSON.stringify(data.user));
+      await fetchUserData(data.user.id);
     } catch (error: any) {
       throw new Error(error.message || "Registration failed");
     } finally {
@@ -80,6 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginWithOAuth = async (provider: "google" | "apple") => {
     setIsLoading(true);
+    setIsUserReady(false);
     try {
       // In a real app, this would redirect to OAuth provider
       // For demo purposes, we'll simulate a successful OAuth login
@@ -95,6 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       setUser(mockUser);
       localStorage.setItem("airbear-user", JSON.stringify(mockUser));
+      await fetchUserData(mockUser.id);
       
       toast({
         title: "OAuth Success",
@@ -119,6 +143,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = {
     user,
     isLoading,
+    isUserReady,
     login,
     register,
     loginWithOAuth,

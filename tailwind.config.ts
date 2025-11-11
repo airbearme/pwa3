@@ -64,7 +64,7 @@ export default {
         // AirBear Eco Colors
         emerald: {
           50: "#ecfdf5",
-          100: "#d1fae5", 
+          100: "#d1fae5",
           200: "#a7f3d0",
           300: "#6ee7b7",
           400: "#34d399",
@@ -77,7 +77,7 @@ export default {
         lime: {
           50: "#f7fee7",
           100: "#ecfccb",
-          200: "#d9f99d", 
+          200: "#d9f99d",
           300: "#bef264",
           400: "#a3e635",
           500: "#84cc16",
@@ -90,7 +90,7 @@ export default {
           50: "#fffbeb",
           100: "#fef3c7",
           200: "#fde68a",
-          300: "#fcd34d", 
+          300: "#fcd34d",
           400: "#fbbf24",
           500: "#f59e0b",
           600: "#d97706",
@@ -123,64 +123,64 @@ export default {
         },
         // AirBear Custom Keyframes
         "pulse-glow": {
-          "0%": { 
-            boxShadow: "0 0 20px rgba(16, 185, 129, 0.4)" 
+          "0%": {
+            boxShadow: "0 0 20px rgba(16, 185, 129, 0.4)"
           },
-          "100%": { 
-            boxShadow: "0 0 40px rgba(16, 185, 129, 0.8), 0 0 60px rgba(16, 185, 129, 0.4)" 
+          "100%": {
+            boxShadow: "0 0 40px rgba(16, 185, 129, 0.8), 0 0 60px rgba(16, 185, 129, 0.4)"
           },
         },
         "float": {
-          "0%, 100%": { 
-            transform: "translateY(0px)" 
+          "0%, 100%": {
+            transform: "translateY(0px)"
           },
-          "50%": { 
-            transform: "translateY(-10px)" 
+          "50%": {
+            transform: "translateY(-10px)"
           },
         },
         "shimmer": {
-          "0%": { 
-            transform: "translateX(-100%)" 
+          "0%": {
+            transform: "translateX(-100%)"
           },
-          "100%": { 
-            transform: "translateX(100%)" 
+          "100%": {
+            transform: "translateX(100%)"
           },
         },
         "particle": {
-          "0%, 100%": { 
-            transform: "translateY(0) scale(1)", 
-            opacity: "1" 
+          "0%, 100%": {
+            transform: "translateY(0) scale(1)",
+            opacity: "1"
           },
-          "50%": { 
-            transform: "translateY(-20px) scale(1.2)", 
-            opacity: "0.7" 
+          "50%": {
+            transform: "translateY(-20px) scale(1.2)",
+            opacity: "0.7"
           },
         },
         "rickshaw-bounce": {
-          "0%": { 
-            transform: "scale(1)" 
+          "0%": {
+            transform: "scale(1)"
           },
-          "50%": { 
-            transform: "scale(1.1) rotate(5deg)" 
+          "50%": {
+            transform: "scale(1.1) rotate(5deg)"
           },
-          "100%": { 
-            transform: "scale(1)" 
+          "100%": {
+            transform: "scale(1)"
           },
         },
         "wheel-spin": {
-          "from": { 
-            transform: "rotate(0deg)" 
+          "from": {
+            transform: "rotate(0deg)"
           },
-          "to": { 
-            transform: "rotate(360deg)" 
+          "to": {
+            transform: "rotate(360deg)"
           },
         },
         "neon-glow": {
-          "0%": { 
-            filter: "drop-shadow(0 0 5px rgba(16, 185, 129, 0.8)) drop-shadow(0 0 10px rgba(16, 185, 129, 0.6))" 
+          "0%": {
+            filter: "drop-shadow(0 0 5px rgba(16, 185, 129, 0.8))"
           },
-          "100%": { 
-            filter: "drop-shadow(0 0 10px rgba(16, 185, 129, 1)) drop-shadow(0 0 20px rgba(16, 185, 129, 0.8)) drop-shadow(0 0 30px rgba(16, 185, 129, 0.4))" 
+          "100%": {
+            filter: "drop-shadow(0 0 10px rgba(16, 185, 129, 1))"
           },
         },
         "vortex-zoom": {
@@ -237,11 +237,11 @@ export default {
         "float": "float 6s ease-in-out infinite",
         "shimmer": "shimmer 2s linear infinite",
         "particle": "particle 4s ease-in-out infinite",
-        "rickshaw-bounce": "rickshaw-bounce 1s cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+        "rickshaw-bounce": "rickshaw-bounce 1s",
         "wheel-spin": "wheel-spin 1s linear infinite",
         "neon-glow": "neon-glow 1.5s ease-in-out infinite alternate",
-        "vortex-zoom": "vortex-zoom 0.8s cubic-bezier(0.4, 0, 0.2, 1)",
-        "confetti-burst": "confetti-burst 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+        "vortex-zoom": "vortex-zoom 0.8s",
+        "confetti-burst": "confetti-burst 0.6s",
         "liquid-fill": "liquid-fill 1s ease-out",
         "ripple-wave": "ripple-wave 0.6s ease-out",
       },
@@ -251,7 +251,7 @@ export default {
     },
   },
   plugins: [
-    require("tailwindcss-animate"), 
+    require("tailwindcss-animate"),
     require("@tailwindcss/typography"),
   ],
 } satisfies Config;

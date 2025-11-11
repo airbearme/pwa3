@@ -175,7 +175,7 @@ export default function Promo() {
                 <Checkbox 
                   id="terms" 
                   checked={acceptedTerms}
-                  onCheckedChange={(checked) => setAcceptedTerms(checked === true)}
+                  onCheckedChange={setAcceptedTerms}
                 />
                 <label htmlFor="terms" className="text-sm cursor-pointer">
                   I agree to the{" "}

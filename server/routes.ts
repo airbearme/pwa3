@@ -4,16 +4,6 @@ import Stripe from "stripe";
 import { storage } from "./storage";
 import { insertRideSchema, insertOrderSchema, insertPaymentSchema, insertUserSchema } from "@shared/schema";
 import { z } from "zod";
-import {
-  registerSchema,
-  loginSchema,
-  createRideSchema,
-  updateRideSchema,
-  createOrderSchema,
-  createPaymentIntentSchema,
-  confirmPaymentSchema,
-  purchaseCeoTshirtSchema
-} from "./validation";
 
 // Mock Stripe client when no API key is provided
 const isMockMode = !process.env.STRIPE_SECRET_KEY;
@@ -38,9 +28,9 @@ if (isMockMode) {
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
-  app.post("/api/auth/register", async (req, res, next) => {
+  app.post("/api/auth/register", async (req, res) => {
     try {
-      const userData = registerSchema.parse(req.body);
+      const userData = insertUserSchema.parse(req.body);
       const existingUser = await storage.getUserByEmail(userData.email);
       
       if (existingUser) {
@@ -49,14 +39,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const user = await storage.createUser(userData);
       res.json({ user: { id: user.id, email: user.email, username: user.username, role: user.role } });
-    } catch (error) {
-      next(error);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
     }
   });
 
-  app.post("/api/auth/login", async (req, res, next) => {
+  app.post("/api/auth/login", async (req, res) => {
     try {
-      const { email } = loginSchema.parse(req.body);
+      const { email } = req.body;
       const user = await storage.getUserByEmail(email);
       
       if (!user) {
@@ -64,8 +54,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       res.json({ user: { id: user.id, email: user.email, username: user.username, role: user.role } });
-    } catch (error) {
-      next(error);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
     }
   });
 
@@ -99,13 +89,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Rides routes
-  app.post("/api/rides", async (req, res, next) => {
+  app.post("/api/rides", async (req, res) => {
     try {
-      const rideData = createRideSchema.parse(req.body);
+      const rideData = insertRideSchema.parse(req.body);
       const ride = await storage.createRide(rideData);
       res.json(ride);
-    } catch (error) {
-      next(error);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
     }
   });
 
@@ -119,14 +109,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/rides/:id", async (req, res, next) => {
+  app.patch("/api/rides/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      const updates = updateRideSchema.parse(req.body);
+      const updates = req.body;
       const ride = await storage.updateRide(id, updates);
       res.json(ride);
-    } catch (error) {
-      next(error);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
     }
   });
 
@@ -144,13 +134,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Orders routes
-  app.post("/api/orders", async (req, res, next) => {
+  app.post("/api/orders", async (req, res) => {
     try {
-      const orderData = createOrderSchema.parse(req.body);
+      const orderData = insertOrderSchema.parse(req.body);
       const order = await storage.createOrder(orderData);
       res.json(order);
-    } catch (error) {
-      next(error);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
     }
   });
 
@@ -165,9 +155,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Stripe payment routes
-  app.post("/api/create-payment-intent", async (req, res, next) => {
+  app.post("/api/create-payment-intent", async (req, res) => {
     try {
-      const { amount, orderId, rideId, paymentMethod = "stripe" } = createPaymentIntentSchema.parse(req.body);
+      const { amount, orderId, rideId, paymentMethod = "stripe" } = req.body;
+
+      if (!amount || amount <= 0) {
+        return res.status(400).json({ message: "Invalid amount" });
+      }
 
       let paymentIntent;
       
@@ -204,26 +198,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           paymentIntentId: paymentIntent.id
         });
       }
-    } catch (error) {
-      next(error);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error creating payment intent: " + error.message });
     }
   });
 
   // Payment confirmation
-  app.post("/api/payments/confirm", async (req, res, next) => {
+  app.post("/api/payments/confirm", async (req, res) => {
     try {
-      const paymentData = confirmPaymentSchema.parse(req.body);
+      const paymentData = insertPaymentSchema.parse(req.body);
       const payment = await storage.createPayment(paymentData);
       res.json(payment);
-    } catch (error) {
-      next(error);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
     }
   });
 
   // CEO T-shirt purchase route
-  app.post("/api/ceo-tshirt/purchase", async (req, res, next) => {
+  app.post("/api/ceo-tshirt/purchase", async (req, res) => {
     try {
-      const { userId, size, amount } = purchaseCeoTshirtSchema.parse(req.body);
+      const { userId, size, amount } = req.body;
       
       // Create Stripe PaymentIntent for CEO T-shirt
       const paymentIntent = await stripe.paymentIntents.create({
@@ -245,8 +239,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         clientSecret: paymentIntent.client_secret,
         paymentIntentId: paymentIntent.id
       });
-    } catch (error) {
-      next(error);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error creating CEO T-shirt payment: " + error.message });
     }
   });
 
