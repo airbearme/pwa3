@@ -24,7 +24,7 @@ export function log(message: string, source = "express") {
 
 export async function setupVite(app: Express, server: Server) {
   console.log("Setting up Vite...");
-  
+
   const vite = await createViteServer({
     ...viteConfig,
     configFile: false,
@@ -38,8 +38,14 @@ export async function setupVite(app: Express, server: Server) {
     appType: "custom",
   });
 
-  app.use(vite.middlewares);
-  console.log("Vite middlewares added");
+  // Only use Vite middleware for non-API routes
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api/')) {
+      return next();
+    }
+    return vite.middlewares(req, res, next);
+  });
+  console.log("Vite middlewares added (excluding API routes)");
   
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;

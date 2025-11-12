@@ -304,6 +304,8 @@ export class MemStorage implements IStorage {
     const ride: Ride = {
       ...insertRide,
       id: randomUUID(),
+      userId: insertRide.userId || null,
+      guestUserId: insertRide.guestUserId || null,
       driverId: insertRide.driverId || null,
       airbearId: insertRide.airbearId || null,
       status: insertRide.status || "pending",

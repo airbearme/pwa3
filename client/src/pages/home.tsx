@@ -75,7 +75,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <span className="bg-gradient-to-r from-emerald-600 via-lime-500 to-amber-500 bg-clip-text text-transparent animate-pulse-glow airbear-holographic">
+            <span className="bg-gradient-to-r from-emerald-600 via-lime-500 to-amber-500 bg-clip-text text-white animate-pulse-glow airbear-holographic">
               AirBear Mobile Bodega
             </span>
             <br />
@@ -106,17 +106,17 @@ export default function Home() {
             </div>
           </motion.h1>
           
-          <motion.p 
+          <motion.p
             className="text-xl sm:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed airbear-eco-breeze"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <span className="text-primary font-bold animate-shimmer">Experience the future of sustainable transportation!</span> 
+            <span className="text-primary font-bold animate-shimmer">Mobile bodega and solar-powered rideshare!</span>
             <br />
-            Solar-powered vehicles with onboard shopping experiences, 
-            <span className="text-emerald-500 font-semibold airbear-god-rays"> zero emissions</span>, and 
-            <span className="text-amber-500 font-semibold"> revolutionary eco-mobility!</span>
+            Experience eco-friendly transportation with onboard shopping,
+            <span className="text-emerald-500 font-semibold airbear-god-rays"> zero emissions</span>, and
+            <span className="text-amber-500 font-semibold"> revolutionary sustainable mobility!</span>
           </motion.p>
 
           {/* CTA Buttons */}
@@ -147,13 +147,13 @@ export default function Home() {
               CEO T-Shirt $100
             </Button>
             
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="lg"
               className="border-2 border-primary text-primary hover:bg-primary/10 px-8 py-4 text-lg font-semibold hover-lift ripple-effect"
               data-testid="button-watch-demo"
               onClick={() => {
-                window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
+                window.open('https://www.facebook.com/reel/1848713332735111', '_blank');
               }}
             >
               <i className="fas fa-play mr-3"></i>
@@ -279,6 +279,209 @@ export default function Home() {
               </Card>
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* Map Preview Section */}
+      <section className="relative py-20 bg-gradient-to-b from-emerald-50/30 to-lime-50/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+              Explore <span className="text-primary animate-pulse-glow">Binghamton</span> Map
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Discover our beautiful solar-powered network across Binghamton with interactive locations
+            </p>
+          </motion.div>
+
+          <motion.div
+            className="bg-card rounded-2xl p-6 shadow-2xl glass-morphism mb-8 relative overflow-hidden"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            {/* Decorative background elements */}
+            <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+              <div className="absolute top-4 left-4 w-32 h-32 bg-primary/5 rounded-full blur-3xl animate-pulse"></div>
+              <div className="absolute bottom-4 right-4 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl animate-pulse" style={{animationDelay: '1s'}}></div>
+              <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-amber-500/5 rounded-full blur-xl animate-pulse" style={{animationDelay: '2s'}}></div>
+            </div>
+
+            <div className="aspect-video rounded-xl overflow-hidden relative shadow-inner bg-gradient-to-br from-emerald-100 to-lime-100">
+              {/* Simplified Map Preview */}
+              <div className="w-full h-full relative">
+                {/* Binghamton outline/map background */}
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-200 via-lime-100 to-amber-100 opacity-80"></div>
+
+                {/* Chenango River representation */}
+                <div className="absolute top-1/2 left-0 right-0 h-2 bg-blue-300 opacity-60 rounded-full"></div>
+
+                {/* Binghamton landmarks/areas */}
+                <div className="absolute top-1/4 left-1/4 w-3 h-3 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/50">
+                  <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs font-bold text-emerald-700 whitespace-nowrap">Downtown</div>
+                </div>
+
+                <div className="absolute top-1/3 right-1/4 w-3 h-3 bg-lime-500 rounded-full animate-pulse shadow-lg shadow-lime-500/50" style={{animationDelay: '0.5s'}}>
+                  <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs font-bold text-lime-700 whitespace-nowrap">University</div>
+                </div>
+
+                <div className="absolute bottom-1/3 left-1/3 w-3 h-3 bg-amber-500 rounded-full animate-pulse shadow-lg shadow-amber-500/50" style={{animationDelay: '1s'}}>
+                  <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs font-bold text-amber-700 whitespace-nowrap">Airport</div>
+                </div>
+
+                <div className="absolute bottom-1/4 right-1/3 w-3 h-3 bg-primary rounded-full animate-pulse shadow-lg shadow-primary/50" style={{animationDelay: '1.5s'}}>
+                  <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs font-bold text-primary whitespace-nowrap">Mall</div>
+                </div>
+
+                {/* AirBear locations */}
+                {Array.from({ length: 16 }, (_, i) => {
+                  const angle = (i * 360) / 16;
+                  const radius = 35;
+                  const x = 50 + radius * Math.cos((angle * Math.PI) / 180);
+                  const y = 50 + radius * Math.sin((angle * Math.PI) / 180);
+
+                  return (
+                    <div
+                      key={i}
+                      className="absolute w-2 h-2 bg-gradient-to-r from-emerald-500 via-lime-500 to-green-400 rounded-full animate-pulse shadow-lg border border-white"
+                      style={{
+                        left: `${x}%`,
+                        top: `${y}%`,
+                        animationDelay: `${i * 0.1}s`,
+                        transform: 'translate(-50%, -50%)'
+                      }}
+                    >
+                      {/* Solar rays effect */}
+                      <div className="absolute inset-0 rounded-full border border-yellow-400 opacity-40 animate-ping"></div>
+                    </div>
+                  );
+                })}
+
+                {/* Central hub */}
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                  <div className="w-6 h-6 bg-gradient-to-r from-emerald-600 to-lime-600 rounded-full animate-pulse shadow-xl shadow-emerald-500/60 flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">🐻</span>
+                  </div>
+                  <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs font-bold text-emerald-800 whitespace-nowrap">
+                    AirBear Hub
+                  </div>
+                </div>
+
+                {/* Route lines */}
+                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
+                  <defs>
+                    <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="rgb(16, 185, 129)" stopOpacity="0.3" />
+                      <stop offset="50%" stopColor="rgb(132, 204, 22)" stopOpacity="0.6" />
+                      <stop offset="100%" stopColor="rgb(16, 185, 129)" stopOpacity="0.3" />
+                    </linearGradient>
+                  </defs>
+                  {/* Curved route lines */}
+                  <path d="M 20,30 Q 50,20 80,40" stroke="url(#routeGradient)" strokeWidth="1" fill="none" strokeDasharray="2,2" className="animate-pulse" />
+                  <path d="M 15,60 Q 50,70 85,50" stroke="url(#routeGradient)" strokeWidth="1" fill="none" strokeDasharray="2,2" className="animate-pulse" style={{animationDelay: '1s'}} />
+                  <path d="M 25,80 Q 50,60 75,85" stroke="url(#routeGradient)" strokeWidth="1" fill="none" strokeDasharray="2,2" className="animate-pulse" style={{animationDelay: '2s'}} />
+                </svg>
+
+                {/* Map overlay info */}
+                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg">
+                  <div className="flex items-center space-x-2 text-sm">
+                    <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
+                    <span className="font-semibold text-emerald-700">16 AirBear Spots</span>
+                  </div>
+                  <div className="text-xs text-gray-600 mt-1">Binghamton Network</div>
+                </div>
+
+                <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg">
+                  <div className="flex items-center space-x-2 text-sm">
+                    <span className="text-yellow-500">⚡</span>
+                    <span className="font-semibold text-amber-700">Solar Powered</span>
+                  </div>
+                  <div className="text-xs text-gray-600 mt-1">Zero Emissions</div>
+                </div>
+              </div>
+
+              {/* Map Controls */}
+              <div className="absolute top-4 right-4 flex flex-col space-y-2">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="w-8 h-8 p-0 bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white transition-all duration-200"
+                  onClick={() => {
+                    // Simulate zoom in
+                    const mapElement = document.querySelector('.map-preview');
+                    if (mapElement) {
+                      mapElement.classList.add('scale-110');
+                      setTimeout(() => mapElement.classList.remove('scale-110'), 300);
+                    }
+                  }}
+                >
+                  <span className="text-lg">+</span>
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="w-8 h-8 p-0 bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white transition-all duration-200"
+                  onClick={() => {
+                    // Simulate zoom out
+                    const mapElement = document.querySelector('.map-preview');
+                    if (mapElement) {
+                      mapElement.classList.add('scale-90');
+                      setTimeout(() => mapElement.classList.remove('scale-90'), 300);
+                    }
+                  }}
+                >
+                  <span className="text-lg">−</span>
+                </Button>
+              </div>
+            </div>
+
+            {/* Map Legend */}
+            <div className="mt-6 flex flex-wrap justify-center gap-6 text-sm">
+              <div className="flex items-center space-x-3 bg-card/50 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/10">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-gradient-to-r from-emerald-500 to-green-400 rounded-full animate-pulse"></div>
+                  <span className="font-medium">Available AirBear</span>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3 bg-card/50 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/10">
+                <div className="flex items-center space-x-2">
+                  <span className="text-amber-500">⚡</span>
+                  <span className="font-medium">Solar Charging</span>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3 bg-card/50 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/10">
+                <div className="flex items-center space-x-2">
+                  <span className="text-blue-500">🏪</span>
+                  <span className="font-medium">Mobile Bodega</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="text-center"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
+            <Link to="/map">
+              <Button
+                size="lg"
+                className="eco-gradient text-white hover-lift ripple-effect px-8 py-4 text-lg font-semibold animate-neon-glow"
+              >
+                <i className="fas fa-map-marked-alt mr-3"></i>
+                View Full Interactive Map
+              </Button>
+            </Link>
+          </motion.div>
         </div>
       </section>
 

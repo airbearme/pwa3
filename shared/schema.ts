@@ -54,7 +54,8 @@ export const airbears = pgTable("airbears", {
 // Rides table
 export const rides = pgTable("rides", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").notNull().references(() => users.id),
+  userId: varchar("user_id").references(() => users.id), // Made nullable for guest bookings
+  guestUserId: varchar("guest_user_id"), // For guest bookings
   driverId: varchar("driver_id").references(() => users.id),
   airbearId: varchar("airbear_id").references(() => airbears.id),
   pickupSpotId: varchar("pickup_spot_id").notNull().references(() => spots.id),

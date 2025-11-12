@@ -20,9 +20,24 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
+    port: 5173,
+    strictPort: true,
+    hmr: {
+      port: 5173,
+      clientPort: 5173,
+      host: 'localhost',
+      protocol: 'ws',
+    },
     fs: {
       strict: false,
       allow: [".."],
+    },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 });

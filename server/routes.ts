@@ -91,9 +91,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rides routes
   app.post("/api/rides", async (req, res) => {
     try {
-      const rideData = insertRideSchema.parse(req.body);
-      const ride = await storage.createRide(rideData);
-      res.json(ride);
+      const rideData = req.body;
+
+      // Handle guest bookings - use guestUserId field for guest bookings
+      if (rideData.userId && rideData.userId.startsWith('guest_')) {
+        // For guest bookings, use guestUserId field
+        const guestRideData = {
+          guestUserId: rideData.userId, // Store guest ID in guestUserId field
+          userId: null, // No registered user
+          pickupSpotId: rideData.pickupSpotId,
+          destinationSpotId: rideData.destinationSpotId,
+          fare: rideData.fare || 4.00, // Default to $4
+          status: 'pending' as const, // Use const assertion for proper typing
+        };
+
+        // Create ride for guest booking
+        const ride = await storage.createRide(guestRideData);
+        res.json(ride);
+      } else {
+        // Regular user booking with full validation
+        const validatedRideData = insertRideSchema.parse(rideData);
+        const ride = await storage.createRide(validatedRideData);
+        res.json(ride);
+      }
     } catch (error: any) {
       res.status(400).json({ message: error.message });
     }
