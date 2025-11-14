@@ -1,0 +1,57 @@
+# To better understand this file read this:
+# https://docs.ionos.space/docs/github-actions-customization/
+
+name: "Deploy Now: Execute Build"
+
+on:
+  workflow_call:
+    inputs:
+      site-url:
+        required: true
+        type: string
+      branch-id:
+        required: true
+        type: string
+
+env:
+  DEPLOYMENT_FOLDER: dist/public
+
+jobs:
+# Please do not rename this job
+  build-project:
+    name: build pwa3
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: v18.x (LTS)
+
+      - name: Build Node assets
+        env:
+          CI: true
+          HOST: 0.0.0.0
+          NODE_ENV: production
+          PORT: 3000
+          SITE_URL: ${{ inputs.site-url }}
+          SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0enN4Y3Vra3JqZm1hbmhyZ291Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3NzAxOTUsImV4cCI6MjA3NzM0NjE5NX0.8zVr0URlLlLtrB
+           SUPABASE_URL: https://etzsxcurkrjfmanhrgou.supabase.co
+        run: npm install && npm run build
+
+# Please do not touch the following action
+      - name: Store deployment content
+        uses: ionos-deploy-now/artifact-action@v1
+        with:
+          api-key: ${{ secrets.IONOS_API_KEY }}
+          service-host: api-us.ionos.space
+          project-id: c3cbe385-3284-461c-87b2-d8e56b8fc457
+          branch-id: ${{ inputs.branch-id }}
+          version: ${{ github.sha }}
+          folder: ${{ env.DEPLOYMENT_FOLDER }}
+          config-file: .deploy-now/pwa3/config.yaml
+          action: upload
