@@ -1,9 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
-import { fileURLToPath } from 'url';
 import path from 'path';
 import mockApi from './mock-api';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -29,7 +26,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 
 // In production, serve static files from dist
 if (process.env.NODE_ENV === 'production') {
-  const publicPath = path.join(__dirname, '../dist/public');
+  const publicPath = path.resolve('dist/public');
   app.use(express.static(publicPath));
   
   // Handle SPA routing - return index.html for all other routes

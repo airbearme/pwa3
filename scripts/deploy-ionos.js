@@ -4,6 +4,10 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import Client from 'ftp';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
 
 const IONOS_CONFIG = {
   host: process.env.IONOS_FTP_HOST || 'ftp.airbear.me',
