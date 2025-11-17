@@ -39,8 +39,8 @@ jobs:
           NODE_ENV: production
           PORT: 3000
           SITE_URL: ${{ inputs.site-url }}
-          SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0enN4Y3Vra3JqZm1hbmhyZ291Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3NzAxOTUsImV4cCI6MjA3NzM0NjE5NX0.8zVr0URlLlLtrB
-           SUPABASE_URL: https://etzsxcurkrjfmanhrgou.supabase.co
+          SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0enN4Y3Vra3JqZm1hbmhyZ291Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3NzAxOTUsImV4cCI6MjA3NzM0NjE5NX0.8zVr0URlLlLtrPj8B"
+          SUPABASE_URL: https://etzsxcurkrjfmanhrgou.supabase.co
         run: npm install && npm run build
 
 # Please do not touch the following action
