@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useAuth } from "@/hooks/use-auth";
+import { useAirbearSession } from "@/hooks/use-airbear-session";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import RickshawWheel from "@/components/airbear-wheel";
@@ -42,7 +42,7 @@ interface CartItem extends BodegaItem {
 }
 
 export default function Bodega() {
-  const { user } = useAuth();
+  const { user } = useAirbearSession();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -55,6 +55,14 @@ export default function Bodega() {
   const { data: items, isLoading } = useQuery<BodegaItem[]>({
     queryKey: ["/api/bodega/items", selectedCategory === "all" ? null : selectedCategory],
   });
+
+  const ecoItemCount = items?.filter(item => item.isEcoFriendly).length ?? 0;
+  const availableCount = items?.filter(item => item.isAvailable && item.stock > 0).length ?? 0;
+  const totalStockValue = items?.reduce((sum, item) => {
+    const price = parseFloat(item.price) || 0;
+    return sum + price * item.stock;
+  }, 0) ?? 0;
+  const formattedStockValue = totalStockValue.toFixed(0);
 
   const createOrderMutation = useMutation({
     mutationFn: async (orderData: any) => {
@@ -180,6 +188,37 @@ export default function Bodega() {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Shop local products during your ride with sparkling add-to-cart magic
           </p>
+        </motion.div>
+
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          {[
+            {
+              label: "Total Items",
+              value: items?.length ?? 0,
+              description: "Fresh local products",
+            },
+            {
+              label: "Available for Pickup",
+              value: availableCount,
+              description: "In-stock and ready",
+            },
+            {
+              label: "Eco Certified",
+              value: ecoItemCount,
+              description: `Inventory value $${formattedStockValue}`,
+            },
+          ].map(card => (
+            <div key={card.label} className="rounded-2xl border border-white/10 bg-muted/30 p-4 shadow-lg">
+              <p className="text-xs uppercase tracking-[0.4em] text-amber-300">{card.label}</p>
+              <p className="text-2xl font-bold text-white mt-2">{card.value}</p>
+              <p className="text-sm text-muted-foreground">{card.description}</p>
+            </div>
+          ))}
         </motion.div>
 
         {/* Search and Filter Bar */}
@@ -497,7 +536,7 @@ export default function Bodega() {
                         )}
                       </Button>
                     ) : (
-                      <Link to="/auth">
+                      <Link to="/login">
                         <Button className="w-full eco-gradient text-white" data-testid="button-sign-in-to-checkout">
                           Sign In to Checkout
                         </Button>

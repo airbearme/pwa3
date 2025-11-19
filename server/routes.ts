@@ -234,6 +234,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/payments/user/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const payments = await storage.getPaymentsByUser(userId);
+      res.json(payments);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // CEO T-shirt purchase route
   app.post("/api/ceo-tshirt/purchase", async (req, res) => {
     try {

@@ -13,13 +13,13 @@ import {
 import { Moon, Sun, Menu, User, Settings, LogOut, Award, Gift } from "lucide-react";
 import { useTheme } from "next-themes";
 import RickshawWheel from "@/components/airbear-wheel";
-import { useAuth } from "@/hooks/use-auth";
+import { useAirbearSession } from "@/hooks/use-airbear-session";
 import { motion } from "framer-motion";
 
 export default function Header() {
   const [location] = useLocation();
   const { theme, setTheme } = useTheme();
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAirbearSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navigation = [
@@ -120,9 +120,9 @@ export default function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full hover-lift" data-testid="button-user-menu">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.avatarUrl || ""} alt={user.username || ""} />
+                      <AvatarImage src={user.user_metadata?.avatar_url || user.app_metadata?.avatar_url || ""} alt={user.user_metadata?.username || user.app_metadata?.username || ""} />
                       <AvatarFallback className="bg-primary text-primary-foreground">
-                        {user.username?.charAt(0).toUpperCase() || "U"}
+                        {(user.user_metadata?.username || user.app_metadata?.username || user.email?.charAt(0) || "U").toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -130,7 +130,7 @@ export default function Header() {
                 <DropdownMenuContent className="w-56 glass-morphism" align="end" forceMount>
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">{user.username}</p>
+                      <p className="font-medium">{user.user_metadata?.username || user.app_metadata?.username || "User"}</p>
                       <p className="w-[200px] truncate text-sm text-muted-foreground">
                         {user.email}
                       </p>
@@ -169,7 +169,7 @@ export default function Header() {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
                     className="cursor-pointer text-destructive focus:text-destructive" 
-                    onClick={logout}
+                    onClick={signOut}
                     data-testid="menu-logout"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
@@ -179,7 +179,7 @@ export default function Header() {
               </DropdownMenu>
             ) : (
               <div className="hidden md:flex items-center space-x-3">
-                <Link to="/auth">
+                <Link to="/login">
                   <Button 
                     variant="ghost" 
                     className="text-primary border border-primary/30 hover:bg-primary/10 hover-lift ripple-effect"
@@ -188,7 +188,7 @@ export default function Header() {
                     Sign In
                   </Button>
                 </Link>
-                <Link to="/auth?mode=signup">
+                <Link to="/login?mode=signup">
                   <Button 
                     className="eco-gradient text-white hover-lift animate-pulse-glow ripple-effect"
                     data-testid="button-get-started"
@@ -247,7 +247,7 @@ export default function Header() {
                   {/* Mobile Auth */}
                   {!user && (
                     <div className="flex flex-col space-y-3 pt-6 border-t">
-                      <Link to="/auth">
+                      <Link to="/login">
                         <Button 
                           variant="outline" 
                           className="w-full"
@@ -257,7 +257,7 @@ export default function Header() {
                           Sign In
                         </Button>
                       </Link>
-                      <Link to="/auth?mode=signup">
+                      <Link to="/login?mode=signup">
                         <Button 
                           className="w-full eco-gradient text-white"
                           onClick={() => setMobileMenuOpen(false)}
@@ -274,13 +274,13 @@ export default function Header() {
                     <div className="flex flex-col space-y-3 pt-6 border-t">
                       <div className="flex items-center space-x-3 p-2">
                         <Avatar className="h-10 w-10">
-                          <AvatarImage src={user.avatarUrl || ""} alt={user.username || ""} />
+                          <AvatarImage src={user.user_metadata?.avatar_url || user.app_metadata?.avatar_url || ""} alt={user.user_metadata?.username || user.app_metadata?.username || ""} />
                           <AvatarFallback className="bg-primary text-primary-foreground">
-                            {user.username?.charAt(0).toUpperCase() || "U"}
+                            {(user.user_metadata?.username || user.app_metadata?.username || user.email?.charAt(0) || "U").toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium">{user.username}</p>
+                          <p className="font-medium">{user.user_metadata?.username || user.app_metadata?.username || "User"}</p>
                           <p className="text-sm text-muted-foreground">{user.email}</p>
                         </div>
                       </div>
@@ -325,7 +325,7 @@ export default function Header() {
                         variant="ghost" 
                         className="w-full justify-start text-destructive hover:text-destructive"
                         onClick={() => {
-                          logout();
+                          signOut();
                           setMobileMenuOpen(false);
                         }}
                         data-testid="mobile-button-logout"

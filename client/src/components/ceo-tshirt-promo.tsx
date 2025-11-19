@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useAuth } from "@/hooks/use-auth";
+import { useAirbearSession } from "@/hooks/use-airbear-session";
 import { useToast } from "@/hooks/use-toast";
-import { purchaseCeoTshirt } from "@/lib/stripe";
+import { createCheckoutSession } from "@/lib/stripe";
 import AirbearWheel from "./airbear-wheel";
 import { 
   Crown, 
@@ -27,13 +27,12 @@ interface CeoTshirtPromoProps {
 }
 
 export default function CeoTshirtPromo({ isOpen, onClose }: CeoTshirtPromoProps) {
-  const { user } = useAuth();
+  const { user } = useAirbearSession();
   const { toast } = useToast();
   const [selectedSize, setSelectedSize] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [showAgreement, setShowAgreement] = useState(false);
   const [isPurchasing, setIsPurchasing] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
 
   const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
 
@@ -64,29 +63,60 @@ export default function CeoTshirtPromo({ isOpen, onClose }: CeoTshirtPromoProps)
     setIsPurchasing(true);
 
     try {
-      const result = await purchaseCeoTshirt({
-        amount: 100,
-        size: selectedSize,
-        metadata: {
-          user_id: user.id,
-          product_type: 'ceo_tshirt',
-          size: selectedSize,
-        }
+      const orderResponse = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          items: [
+            {
+              itemId: `ceo-tshirt-${selectedSize.toLowerCase()}`,
+              quantity: 1,
+              price: "100.00",
+            },
+          ],
+          totalAmount: "100.00",
+        }),
       });
 
-      if (result.success) {
-        setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 3000);
-        
-        toast({
-          title: "CEO T-Shirt Purchased!",
-          description: "You now have unlimited daily rides! Your t-shirt will be shipped soon.",
-        });
-        
-        onClose();
-      } else {
-        throw new Error(result.error);
+      if (!orderResponse.ok) {
+        const error = await orderResponse.json();
+        throw new Error(error.message || "Unable to create order");
       }
+
+      const order = await orderResponse.json();
+
+      const session = await createCheckoutSession({
+        lineItems: [
+          {
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: "CEO-Signed AirBear T-Shirt",
+                description: `Size ${selectedSize}`,
+              },
+              unit_amount: 10000,
+            },
+            quantity: 1,
+          },
+        ],
+        successUrl: `${window.location.origin}/promo?success=true`,
+        cancelUrl: `${window.location.origin}/promo?cancelled=true`,
+        userId: user.id,
+        orderId: order.id,
+        metadata: {
+          product_type: "ceo_tshirt",
+          size: selectedSize,
+        },
+      });
+
+      if (!session.url) {
+        throw new Error("Stripe checkout URL missing");
+      }
+
+      window.location.href = session.url;
     } catch (error: any) {
       toast({
         title: "Purchase Failed",
@@ -326,37 +356,6 @@ export default function CeoTshirtPromo({ isOpen, onClose }: CeoTshirtPromoProps)
         </DialogContent>
       </Dialog>
 
-      {/* Confetti Effect */}
-      <AnimatePresence>
-        {showConfetti && (
-          <div className="fixed inset-0 pointer-events-none z-50">
-            {Array.from({ length: 100 }, (_, i) => (
-              <motion.div
-                key={i}
-                className="absolute w-3 h-3 rounded-full"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  background: `hsl(${Math.random() * 360}, 80%, 60%)`,
-                }}
-                initial={{ scale: 0, rotate: 0 }}
-                animate={{ 
-                  scale: [0, 1, 0],
-                  rotate: [0, 720],
-                  y: [0, -200, 400],
-                  x: [0, Math.random() * 400 - 200]
-                }}
-                transition={{ 
-                  duration: 3,
-                  ease: "easeOut",
-                  delay: i * 0.01
-                }}
-                exit={{ opacity: 0 }}
-              />
-            ))}
-          </div>
-        )}
-      </AnimatePresence>
     </>
   );
 }

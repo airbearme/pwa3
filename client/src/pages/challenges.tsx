@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { useAuth } from "@/hooks/use-auth";
+import { useAirbearSession } from "@/hooks/use-airbear-session";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import RickshawWheel from "@/components/airbear-wheel";
@@ -38,7 +38,7 @@ interface Challenge {
 }
 
 export default function Challenges() {
-  const { user } = useAuth();
+  const { user } = useAirbearSession();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 

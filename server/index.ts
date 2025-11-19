@@ -1,8 +1,21 @@
+// Load environment variables FIRST (before any imports that need them)
+try {
+  require('dotenv/config');
+} catch (error) {
+  console.log('Note: dotenv not loaded (might already be configured via tsx)');
+}
+
 import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
-import mockApi from './mock-api';
+import authRouter from './routes/auth';
+import spotsRouter from './routes/spots';
+import inventoryRouter from './routes/inventory';
+import ordersRouter from './routes/orders';
+import stripeRouter, { stripeWebhookHandler } from './routes/stripe';
+
 const app = express();
-const port = process.env.PORT || 3000;
+
+app.post('/api/payments/webhook', express.raw({ type: 'application/json' }), stripeWebhookHandler);
 
 // Basic middleware
 app.use(express.json());
@@ -14,8 +27,12 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-// Mock API routes
-app.use('/api', mockApi);
+// Supabase-backed API routes
+app.use('/api', authRouter);
+app.use('/api', spotsRouter);
+app.use('/api', inventoryRouter);
+app.use('/api', ordersRouter);
+app.use('/api', stripeRouter);
 
 // Error handling middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
@@ -39,10 +56,10 @@ if (process.env.NODE_ENV === 'production') {
 const serverPort = parseInt(process.env.PORT || '5000', 10);
 app.listen(serverPort, '0.0.0.0', () => {
   console.log(`Server is running on http://0.0.0.0:${serverPort}`);
-  console.log('Mock API available at:');
-  console.log(`- http://0.0.0.0:${serverPort}/api/products`);
-  console.log(`- http://0.0.0.0:${serverPort}/api/features`);
+  console.log('Supabase-backed API available at:');
+  console.log(`- http://0.0.0.0:${serverPort}/api/inventory`);
+  console.log(`- http://0.0.0.0:${serverPort}/api/orders/:userId`);
+  console.log(`- http://0.0.0.0:${serverPort}/api/payments/create-checkout-session`);
   console.log(`\nTo test the API, run:`);
-  console.log(`curl http://0.0.0.0:${serverPort}/api/products`);
-  console.log(`curl http://0.0.0.0:${serverPort}/api/features`);
+  console.log(`curl http://0.0.0.0:${serverPort}/api/inventory`);
 });

@@ -1,5 +1,16 @@
-import { type User, type InsertUser, type Spot, type InsertSpot, type Airbear, type InsertAirbear, type Ride, type InsertRide, type BodegaItem, type InsertBodegaItem, type Order, type InsertOrder, type Payment, type InsertPayment } from "@shared/schema";
+import { type User, type InsertUser, type Spot, type InsertSpot, type Airbear, type InsertAirbear, type Ride, type InsertRide, type BodegaItem, type InsertBodegaItem, type Order, type InsertOrder, type Payment, type InsertPayment, users, spots, airbears, rides, bodegaItems, orders, payments } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { drizzle } from "drizzle-orm/neon-serverless";
+import { Pool, neonConfig } from "@neondatabase/serverless";
+import ws from "ws";
+import { eq, and, gte, lte, desc } from "drizzle-orm";
+
+// Neon configuration
+neonConfig.webSocketConstructor = ws;
+
+// Initialize Supabase connection via Neon
+const sql = new Pool({ connectionString: process.env.DATABASE_URL });
+const db = drizzle(sql);
 
 export interface IStorage {
   // Users
@@ -425,4 +436,221 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class SupabaseStorage implements IStorage {
+  async getUser(id: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    return result[0];
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const result = await db.insert(users).values({
+      ...insertUser,
+      fullName: insertUser.fullName || null,
+      avatarUrl: insertUser.avatarUrl || null,
+      stripeCustomerId: insertUser.stripeCustomerId || null,
+      stripeSubscriptionId: insertUser.stripeSubscriptionId || null,
+      ecoPoints: insertUser.ecoPoints || 0,
+      totalRides: insertUser.totalRides || 0,
+      co2Saved: insertUser.co2Saved || "0",
+      hasCeoTshirt: insertUser.hasCeoTshirt || false,
+      tshirtPurchaseDate: insertUser.tshirtPurchaseDate || null,
+      role: insertUser.role || "user"
+    }).returning();
+    return result[0];
+  }
+
+  async updateUser(id: string, updates: Partial<User>): Promise<User> {
+    const result = await db.update(users)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async getRidesByUserAndDate(userId: string, date: string): Promise<Ride[]> {
+    const startDate = new Date(date + ' 00:00:00');
+    const endDate = new Date(date + ' 23:59:59');
+    return await db.select()
+      .from(rides)
+      .where(
+        and(
+          eq(rides.userId, userId),
+          gte(rides.requestedAt, startDate),
+          lte(rides.requestedAt, endDate)
+        )
+      );
+  }
+
+  // Spots
+  async getAllSpots(): Promise<Spot[]> {
+    return await db.select().from(spots).orderBy(spots.name);
+  }
+
+  async createSpot(insertSpot: InsertSpot): Promise<Spot> {
+    const result = await db.insert(spots).values({
+      ...insertSpot,
+      isActive: insertSpot.isActive ?? true
+    }).returning();
+    return result[0];
+  }
+
+  async getSpotById(id: string): Promise<Spot | undefined> {
+    const result = await db.select().from(spots).where(eq(spots.id, id)).limit(1);
+    return result[0];
+  }
+
+  // Airbears (renamed from Rickshaws)
+  async getAllAirbears(): Promise<Airbear[]> {
+    return await db.select().from(airbears).orderBy(airbears.createdAt);
+  }
+
+  async getAvailableAirbears(): Promise<Airbear[]> {
+    return await db.select().from(airbears).where(and(eq(airbears.isAvailable, true), eq(airbears.isCharging, false)));
+  }
+
+  async getAirbearsByDriver(driverId: string): Promise<Airbear[]> {
+    return await db.select().from(airbears).where(eq(airbears.driverId, driverId));
+  }
+
+  async createAirbear(insertAirbear: InsertAirbear): Promise<Airbear> {
+    const result = await db.insert(airbears).values({
+      ...insertAirbear,
+      driverId: insertAirbear.driverId || null,
+      currentSpotId: insertAirbear.currentSpotId || null,
+      batteryLevel: insertAirbear.batteryLevel || 100,
+      isAvailable: insertAirbear.isAvailable ?? true,
+      isCharging: insertAirbear.isCharging ?? false,
+      totalDistance: insertAirbear.totalDistance || "0",
+      maintenanceStatus: insertAirbear.maintenanceStatus || "good"
+    }).returning();
+    return result[0];
+  }
+
+  async updateAirbear(id: string, updates: Partial<Airbear>): Promise<Airbear> {
+    const result = await db.update(airbears).set(updates).where(eq(airbears.id, id)).returning();
+    return result[0];
+  }
+
+  // Legacy rickshaw methods for compatibility
+  async getAllRickshaws(): Promise<any[]> {
+    return this.getAllAirbears();
+  }
+
+  async getAvailableRickshaws(): Promise<any[]> {
+    return this.getAvailableAirbears();
+  }
+
+  // Rides
+  async getRidesByUser(userId: string): Promise<Ride[]> {
+    return await db.select().from(rides).where(eq(rides.userId, userId)).orderBy(rides.requestedAt)
+  }
+
+  async getRidesByDriver(driverId: string): Promise<Ride[]> {
+    return await db.select().from(rides).where(eq(rides.driverId, driverId)).orderBy(rides.requestedAt);
+  }
+
+  async createRide(insertRide: InsertRide): Promise<Ride> {
+    const result = await db.insert(rides).values({
+      ...insertRide,
+      userId: insertRide.userId || null,
+      guestUserId: insertRide.guestUserId || null,
+      driverId: insertRide.driverId || null,
+      airbearId: insertRide.airbearId || null,
+      status: insertRide.status || "pending",
+      estimatedDuration: insertRide.estimatedDuration || null,
+      actualDuration: insertRide.actualDuration || null,
+      distance: insertRide.distance || null,
+      co2Saved: insertRide.co2Saved || null,
+      isFreeTshirtRide: insertRide.isFreeTshirtRide || false
+    }).returning();
+    return result[0];
+  }
+
+  async updateRide(id: string, updates: Partial<Ride>): Promise<Ride> {
+    const result = await db.update(rides).set(updates).where(eq(rides.id, id)).returning();
+    return result[0];
+  }
+
+  async getRideById(id: string): Promise<Ride | undefined> {
+    const result = await db.select().from(rides).where(eq(rides.id, id)).limit(1);
+    return result[0];
+  }
+
+  // Bodega Items
+  async getAllBodegaItems(): Promise<BodegaItem[]> {
+    return await db.select().from(bodegaItems).orderBy(bodegaItems.name);
+  }
+
+  async getBodegaItemsByCategory(category: string): Promise<BodegaItem[]> {
+    return await db.select().from(bodegaItems).where(eq(bodegaItems.category, category));
+  }
+
+  async createBodegaItem(insertItem: InsertBodegaItem): Promise<BodegaItem> {
+    const result = await db.insert(bodegaItems).values({
+      ...insertItem,
+      description: insertItem.description || null,
+      imageUrl: insertItem.imageUrl || null,
+      isEcoFriendly: insertItem.isEcoFriendly || false,
+      isAvailable: insertItem.isAvailable ?? true,
+      stock: insertItem.stock || 0
+    }).returning();
+    return result[0];
+  }
+
+  async updateBodegaItem(id: string, updates: Partial<BodegaItem>): Promise<BodegaItem> {
+    const result = await db.update(bodegaItems).set(updates).where(eq(bodegaItems.id, id)).returning();
+    return result[0];
+  }
+
+  // Orders
+  async getOrdersByUser(userId: string): Promise<Order[]> {
+    return await db.select().from(orders).where(eq(orders.userId, userId)).orderBy(orders.createdAt);
+  }
+
+  async createOrder(insertOrder: InsertOrder): Promise<Order> {
+    const result = await db.insert(orders).values({
+      ...insertOrder,
+      rideId: insertOrder.rideId || null,
+      airbearId: insertOrder.airbearId || null,
+      status: insertOrder.status || "pending",
+      notes: insertOrder.notes || null
+    }).returning();
+    return result[0];
+  }
+
+  async updateOrder(id: string, updates: Partial<Order>): Promise<Order> {
+    const result = await db.update(orders).set(updates).where(eq(orders.id, id)).returning();
+    return result[0];
+  }
+
+  // Payments
+  async getPaymentsByUser(userId: string): Promise<Payment[]> {
+    return await db.select().from(payments).where(eq(payments.userId, userId)).orderBy(payments.createdAt);
+  }
+
+  async createPayment(insertPayment: InsertPayment): Promise<Payment> {
+    const result = await db.insert(payments).values({
+      ...insertPayment,
+      orderId: insertPayment.orderId || null,
+      rideId: insertPayment.rideId || null,
+      stripePaymentIntentId: insertPayment.stripePaymentIntentId || null,
+      currency: insertPayment.currency || "usd",
+      status: insertPayment.status || "pending",
+      metadata: insertPayment.metadata || null
+    }).returning();
+    return result[0];
+  }
+
+  async updatePayment(id: string, updates: Partial<Payment>): Promise<Payment> {
+    const result = await db.update(payments).set(updates).where(eq(payments.id, id)).returning();
+    return result[0];
+  }
+}
+
+// Switch to Supabase storage
+export const storage = new SupabaseStorage();

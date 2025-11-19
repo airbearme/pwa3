@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { useAuth } from "@/hooks/use-auth";
+import { useAirbearSession } from "@/hooks/use-airbear-session";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 export default function Promo() {
-  const { user } = useAuth();
+  const { user } = useAirbearSession();
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [showAgreement, setShowAgreement] = useState(false);
   const [promoActive, setPromoActive] = useState(false);
@@ -222,7 +222,7 @@ export default function Promo() {
 
               {!user && (
                 <p className="text-sm text-muted-foreground mt-4">
-                  <Link to="/auth" className="text-primary hover:underline">
+                  <Link to="/login" className="text-primary hover:underline">
                     Sign in
                   </Link>{" "}
                   to activate this exclusive offer

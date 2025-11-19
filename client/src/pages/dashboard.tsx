@@ -12,7 +12,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { useAuth } from "@/hooks/use-auth";
+import { useAirbearSession } from "@/hooks/use-airbear-session";
 import { useQuery } from "@tanstack/react-query";
 import RickshawWheel from "@/components/airbear-wheel";
 import LoadingSpinner from "@/components/loading-spinner";
@@ -40,7 +40,7 @@ interface Analytics {
 }
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user } = useAirbearSession();
   const [activeView, setActiveView] = useState("overview");
 
   const { data: rides, isLoading: ridesLoading } = useQuery<any[]>({
@@ -56,6 +56,36 @@ export default function Dashboard() {
   const { data: analytics } = useQuery<Analytics>({
     queryKey: ["/api/analytics/overview"],
   });
+  const { data: payments } = useQuery<any[]>({
+    queryKey: ["/api/payments/user", user?.id],
+    enabled: !!user?.id,
+  });
+
+  const rideList = Array.isArray(rides) ? rides : [];
+  const orderList = Array.isArray(orders) ? orders : [];
+  
+  const totalRideCount = rideList.length;
+  const completedRideCount = rideList.filter((ride) => ride.status === "completed").length;
+  const totalOrders = orderList.length;
+  const totalOrderSpend = orderList.reduce((sum, order: any) => {
+    const amount = Number(order.totalAmount ?? order.total_amount ?? 0);
+    return sum + (Number.isNaN(amount) ? 0 : amount);
+  }, 0);
+  const orderStatusCounts = orderList.reduce<Record<string, number>>((acc, order) => {
+    const status = (order.status ?? 'pending').toString();
+    acc[status] = (acc[status] || 0) + 1;
+    return acc;
+  }, {});
+  const paymentStatusCounts = (payments ?? []).reduce<Record<string, number>>((acc, payment) => {
+    const status = (payment.status ?? 'pending').toString();
+    acc[status] = (acc[status] || 0) + 1;
+    return acc;
+  }, {});
+  const latestRide = rideList.length > 0 ? rideList[0] : null;
+  const latestOrder = orderList.length > 0 ? orderList[0] : null;
+
+  const formatTimestamp = (value?: string | null) =>
+    value ? new Date(value).toLocaleString() : "—";
 
   if (!user) {
     return (
@@ -78,7 +108,7 @@ export default function Dashboard() {
           <RickshawWheel size="lg" animated glowing />
           <div>
             <h1 className="text-3xl font-bold text-foreground">
-              Welcome back, <span className="text-primary animate-pulse-glow">{user.username}</span>!
+              Welcome back, <span className="text-primary animate-pulse-glow">{user.user_metadata?.username || user.app_metadata?.username || "User"}</span>!
             </h1>
             <p className="text-emerald-600 font-semibold">
               "AirBear flair, ride without a care!"
@@ -111,7 +141,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="flex items-end space-x-4 mb-4">
-              <div className="text-4xl font-bold">{user.ecoPoints?.toLocaleString() || 0}</div>
+              <div className="text-4xl font-bold">{(user.user_metadata?.eco_points || user.app_metadata?.eco_points || 0).toLocaleString()}</div>
               <div className="text-white/80 pb-1">points</div>
             </div>
             <div className="space-y-2">
@@ -186,7 +216,7 @@ export default function Dashboard() {
 
       {/* Stats Grid */}
       <motion.div 
-        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.6 }}
@@ -200,15 +230,74 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-primary mb-2">
-              {user.totalRides || 0}
+              {totalRideCount}
             </div>
             <p className="text-sm text-muted-foreground">
-              Lifetime journeys completed
+              Completed rides recorded this session: {completedRideCount}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="glass-morphism" data-testid="card-co2-saved">
+        <Card className="glass-morphism" data-testid="card-orders">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center">
+              <ShoppingCart className="mr-2 h-5 w-5 text-amber-500" />
+              Orders
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-amber-500 mb-2">
+              {totalOrders}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Total spend: ${totalOrderSpend.toFixed(2)}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="glass-morphism" data-testid="card-active-airbears">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center">
+              <Zap className="mr-2 h-5 w-5 text-emerald-500" />
+              Active Airbears
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-emerald-500 mb-2">
+              {analytics?.activeAirbears ?? "—"}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Airbears ready for pickups
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="glass-morphism" data-testid="card-battery-level">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center">
+              <Battery className="mr-2 h-5 w-5 text-purple-500" />
+              Average Battery
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-purple-500 mb-2">
+              {analytics ? `${analytics.averageBatteryLevel}%` : "—"}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Based on live telemetry
+            </p>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Impact & Rank */}
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.7 }}
+      >
+        <Card className="glass-morphism" data-testid="card-eco-impact">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg flex items-center">
               <Leaf className="mr-2 h-5 w-5 text-green-500" />
@@ -217,7 +306,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-green-500 mb-2">
-              {user.co2Saved || "0"} kg
+              {user.user_metadata?.co2_saved || user.app_metadata?.co2_saved || "0"} kg
             </div>
             <p className="text-sm text-muted-foreground">
               Environmental impact
@@ -239,6 +328,153 @@ export default function Dashboard() {
             <p className="text-sm text-muted-foreground">
               Top eco-warrior
             </p>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Latest Ride & Order */}
+      <motion.div 
+        className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.8 }}
+      >
+        <Card className="glass-morphism">
+          <CardHeader>
+            <CardTitle>Latest Ride</CardTitle>
+            <CardDescription>
+              Most recent request captured by the backend
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {latestRide ? (
+              <div className="space-y-2">
+                <div className="text-lg font-semibold">
+                  {latestRide.pickupSpotId ?? "Unknown pickup"} → {latestRide.destinationSpotId ?? "Unknown dropoff"}
+                </div>
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span>Status</span>
+                  <span>{latestRide.status}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span>Requested</span>
+                  <span>{formatTimestamp(latestRide.requestedAt)}</span>
+                </div>
+              </div>
+            ) : (
+              <p className="text-muted-foreground">Awaiting your next adventure.</p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="glass-morphism">
+          <CardHeader>
+            <CardTitle>Latest Order</CardTitle>
+            <CardDescription>
+              Freshest checkout recorded for your account
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {latestOrder ? (
+              <div className="space-y-2">
+                <div className="text-lg font-semibold">
+                  ${Number(latestOrder.totalAmount ?? latestOrder.total_amount ?? 0).toFixed(2)}
+                </div>
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span>Status</span>
+                  <span>{latestOrder.status}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span>Placed</span>
+                  <span>{formatTimestamp(latestOrder.createdAt ?? latestOrder.created_at)}</span>
+                </div>
+              </div>
+            ) : (
+              <p className="text-muted-foreground">No bodega orders yet.</p>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-2 gap-4"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.95 }}
+      >
+        <Card className="glass-morphism">
+          <CardHeader>
+            <CardTitle>Order Statuses</CardTitle>
+            <CardDescription>Stripe payments update via webhook</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-3">
+              {Object.entries(orderStatusCounts).length === 0 && (
+                <p className="text-sm text-muted-foreground">No orders yet</p>
+              )}
+              {Object.entries(orderStatusCounts).map(([status, count]) => (
+                <div
+                  key={status}
+                  className="flex items-center space-x-2 rounded-full bg-muted/30 px-3 py-1 text-xs"
+                >
+                  <span className="font-semibold">{String(count)}</span>
+                  <span className="uppercase tracking-wide text-muted-foreground">
+                    {status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="glass-morphism">
+          <CardHeader>
+            <CardTitle>Payment Statuses</CardTitle>
+            <CardDescription>Synced from Stripe/Supabase</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-3">
+              {Object.entries(paymentStatusCounts).length === 0 && (
+                <p className="text-sm text-muted-foreground">No payments yet</p>
+              )}
+              {Object.entries(paymentStatusCounts).map(([status, count]) => (
+                <div
+                  key={status}
+                  className="flex items-center space-x-2 rounded-full bg-muted/30 px-3 py-1 text-xs"
+                >
+                  <span className="font-semibold">{count}</span>
+                  <span className="uppercase tracking-wide text-muted-foreground">
+                    {status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="glass-morphism">
+          <CardHeader>
+            <CardTitle>Latest Orders</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {orderList.slice(0, 3).map((order: any) => (
+                <div key={order.id} className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-semibold">{order.id}</p>
+                    <p className="text-xs text-muted-foreground">
+                      ${Number(order.totalAmount ?? order.total_amount ?? 0).toFixed(2)} • {order.status}
+                    </p>
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {formatTimestamp(order.createdAt ?? order.created_at)}
+                  </span>
+                </div>
+              ))}
+              {orderList.length === 0 && (
+                <p className="text-sm text-muted-foreground">No bodega orders yet.</p>
+              )}
+            </div>
           </CardContent>
         </Card>
       </motion.div>
@@ -394,6 +630,39 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </motion.div>
+
+      <motion.div 
+        className="grid grid-cols-1 gap-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+      >
+        <Card className="glass-morphism">
+          <CardHeader>
+            <CardTitle>Pending Assignments</CardTitle>
+            <CardDescription>From latest ride history</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {rideList
+              .filter((ride) => ride.status !== "completed")
+              .slice(0, 3)
+              .map((ride: any) => (
+                <div key={ride.id} className="flex items-center justify-between text-sm">
+                  <div>
+                    <p className="font-semibold">Ride {ride.id.slice(0, 6)}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {ride.pickupSpotId ?? "Unknown"} → {ride.destinationSpotId ?? "Unknown"}
+                    </p>
+                  </div>
+                  <Badge variant="secondary">{ride.status}</Badge>
+                </div>
+              ))}
+            {rideList.filter((ride) => ride.status !== "completed").length === 0 && (
+              <p className="text-sm text-muted-foreground">No pending rides</p>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 
@@ -481,6 +750,56 @@ export default function Dashboard() {
           <CardContent>
             <div className="text-3xl font-bold text-purple-500 mb-2">1.2K</div>
             <p className="text-sm text-muted-foreground">Monthly active</p>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.35 }}
+      >
+        <Card className="glass-morphism">
+          <CardHeader>
+            <CardTitle>Order Health</CardTitle>
+            <CardDescription>Stripe state synced via webhooks</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-3">
+              {Object.entries(orderStatusCounts).length === 0 && (
+                <p className="text-sm text-muted-foreground">No orders recorded yet</p>
+              )}
+              {Object.entries(orderStatusCounts).map(([status, count]) => (
+                <div
+                  key={`admin-${status}`}
+                  className="flex items-center space-x-2 rounded-full bg-muted/30 px-3 py-1 text-xs"
+                >
+                  <span className="font-semibold">{String(count)}</span>
+                  <span className="uppercase text-muted-foreground">{status}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="glass-morphism">
+          <CardHeader>
+            <CardTitle>Driver Readiness</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>Active</span>
+              <span>{analytics?.activeAirbears ?? "—"}</span>
+            </div>
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>Charging</span>
+              <span>{analytics?.chargingAirbears ?? "—"}</span>
+            </div>
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>Maintenance</span>
+              <span>{analytics?.maintenanceAirbears ?? "—"}</span>
+            </div>
           </CardContent>
         </Card>
       </motion.div>

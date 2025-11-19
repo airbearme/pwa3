@@ -2,10 +2,17 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import CeoTshirtPromo from '../ceo-tshirt-promo'
 
-// Mock the useAuth hook
-vi.mock('../../hooks/use-auth', () => ({
-  useAuth: () => ({
-    user: { id: 'test-user-id', email: 'test@example.com' }
+// Mock the useAirbearSession hook
+vi.mock('../../hooks/use-airbear-session', () => ({
+  useAirbearSession: () => ({
+    user: { id: 'test-user-id', email: 'test@example.com', username: 'tester' },
+    role: 'user',
+    loading: false,
+    session: null,
+    signIn: vi.fn(),
+    signUp: vi.fn(),
+    signOut: vi.fn(),
+    error: null
   })
 }))
 
@@ -17,9 +24,6 @@ vi.mock('../../hooks/use-toast', () => ({
 }))
 
 // Mock the stripe utility
-vi.mock('../../lib/stripe', () => ({
-  purchaseCeoTshirt: vi.fn()
-}))
 
 describe('CeoTshirtPromo', () => {
   it('renders the CEO t-shirt promo dialog', () => {

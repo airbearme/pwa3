@@ -1,49 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Test Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirBear PWA Test</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-        .container {
-            text-align: center;
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        h1 {
-            color: #10b981;
-            margin: 0 0 20px 0;
-        }
-        p {
-            color: #666;
-            font-size: 18px;
-        }
-        .status {
-            margin-top: 20px;
-            padding: 10px;
-            background: #d1fae5;
-            border-radius: 10px;
-            color: #065f46;
-        }
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px;
+               background: linear-gradient(135deg, #87CEEB, #98FB98); }
+        h1 { color: #2E8B57; font-size: 3em; }
+        .message { font-size: 1.2em; margin: 20px; color: #333; }
+        .status { padding: 20px; background: white; border-radius: 10px;
+                  display: inline-block; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🐻 AirBear Server Test</h1>
-        <p>If you can see this, the server is working!</p>
-        <div class="status">✅ Server Status: RUNNING</div>
-        <p style="margin-top: 20px; font-size: 14px;">
-            React app should load at: <a href="http://localhost:5000">http://localhost:5000</a>
-        </p>
+    <div class="status">
+        <h1>🚗 AirBear PWA Test</h1>
+        <div class="message">✅ Server is working!</div>
+        <div class="message">✅ Web root found!</div>
+        <div class="message">Next: Upload airbear-deploy files here</div>
+        <div class="message">File: test.html uploaded at <?php echo date('Y-m-d H:i:s'); ?></div>
     </div>
 </body>
 </html>

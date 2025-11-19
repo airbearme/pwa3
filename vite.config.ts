@@ -10,8 +10,13 @@ export default defineConfig(({ mode }) => {
   process.env.NODE_ENV = mode;
   
   return {
-    plugins: [react()],
     root: path.resolve(__dirname, 'client'),
+    plugins: [react()],
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, 'client/src'),
+      },
+    },
     build: {
       outDir: path.resolve(__dirname, 'dist/public'),
       emptyOutDir: true,

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FileZilla3>
+    <Servers>
+        <Server>
+            <Host>access-5018328928.webspace-host.com</Host>
+            <Port>22</Port>
+            <Protocol>1</Protocol>
+            <Type>0</Type>
+            <User>a2096159</User>
+            <Pass>#^Ah0Rn$KEuHrJACgTvJ</Pass>
+            <Logontype>2</Logontype>
+            <TimezoneOffset>0</TimezoneOffset>
+            <PasvMode>MODE_DEFAULT</PasvMode>
+            <MaximumMultipleConnections>0</MaximumMultipleConnections>
+            <EncodingType>Auto</EncodingType>
+            <BypassProxy>0</BypassProxy>
+            <Name>AirBear PWA - IonOS Deploy</Name>
+            <Comments>Secure SFTP deployment for airbear.me</Comments>
+            <LocalDir/>
+            <RemoteDir/>
+            <SyncBrowsing>0</SyncBrowsing>
+            <DirectoryComparison>0</DirectoryComparison>
+        </Server>
+    </Servers>
+    <Settings>
+        <Setting name="Use custom list font">0</Setting>
+        <Setting name="Custom list font"/>
+        <Setting name="Custom list font size">0</Setting>
+    </Settings>
+</FileZilla3>

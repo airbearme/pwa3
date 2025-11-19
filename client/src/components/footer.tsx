@@ -7,7 +7,7 @@ export default function Footer() {
     { name: "Book a Ride", href: "/map" },
     { name: "Shop Bodega", href: "/bodega" },
     { name: "Eco Impact", href: "/#eco" },
-    { name: "Become a Driver", href: "/auth?mode=driver" },
+    { name: "Become a Driver", href: "/login?mode=driver" },
   ];
 
   const supportLinks = [

@@ -1,4 +1,3 @@
-
 # 🐻 AirBear - Solar-Powered Eco-Ride Platform
 
 **"AirBear flair, ride without a care—solar power in the air!"**
@@ -30,6 +29,13 @@ AirBear is a revolutionary solar-powered ride-sharing platform featuring eco-fri
 - **Eco Particles**: Floating leaves, fireflies, clean air breezes
 - **Motion Effects**: 3D tilts, ripples, glitches, vortexes, morphs
 - **Performance**: 60fps optimized, low-power mode support
+
+### 🚀 **Enhanced LLM Rotation System** (Recently Added)
+- **🤖 AI-Powered Provider Selection**: Automatically selects the best free LLM for coding tasks
+- **🔄 Proactive Token Monitoring**: Predicts usage before limits are reached
+- **💰 Cost Optimization**: Prefers free models (DeepSeek, Google, OpenRouter) when possible
+- **📊 Real-time Metrics**: Tracks performance, success rates, and costs across providers
+- **🛡️ Enterprise-Grade**: Multi-provider rotation with cooldown management and capability matching
 
 ## 🚀 **AirBear Slogans**
 
@@ -65,6 +71,11 @@ AirBear is a revolutionary solar-powered ride-sharing platform featuring eco-fri
 - **Leaflet** for interactive mapping
 - **Custom AirBear Markers** with real-time data
 - **Geolocation Services** for user positioning
+
+### AI & Machine Learning
+- **Enhanced LLM Rotation System**: Multi-provider intelligent rotation
+- **Proactive Token Management**: Predictive usage analysis
+- **Provider Capabilities**: Automatic task-based provider selection
 
 ## 🌍 Environmental Impact
 
@@ -125,6 +136,12 @@ DATABASE_URL=postgresql://...
 # API Configuration  
 NODE_ENV=production
 PORT=5000
+
+# LLM API Keys (for enhanced rotation system)
+DEEPSEEK_API_KEY=sk-your-deepseek-key
+OPENAI_API_KEY=sk-your-openai-key
+ANTHROPIC_API_KEY=sk-your-anthropic-key
+GOOGLE_API_KEY=your-google-key
 ```
 
 ## 🚀 Deployment Options
@@ -153,6 +170,12 @@ PORT=5000
    - Visit `https://your-domain.com` (replace with your IONOS domain)
    - The PWA will prompt for installation on mobile devices
 
+### Automated GitHub Action Deployment
+1. **Create Repository Secrets**: In GitHub, add `IONOS_SFTP_HOST`, `IONOS_SFTP_USER`, `IONOS_SFTP_PASSWORD`, and optionally `IONOS_SFTP_PORT` (defaults to `22`) under **Settings > Secrets**.
+2. **Trigger the Workflow**: Push to `main` or dispatch the `Deploy to IONOS SFTP` workflow under the **Actions** tab. The workflow runs `npm ci`, builds the project, and executes `scripts/deploy-ionos.js` with the secret-backed credentials so `dist/public` is pushed to the webspace root.
+3. **Verify**:
+   - Once the workflow succeeds, visit `https://airbear.me` or your assigned domain to confirm the full PWA loads and the add-to-home prompt appears.
+
 ### Replit Static Deployment (Alternative)
 1. Open Deployments tab in Replit
 2. Select "Static" deployment type
@@ -178,12 +201,80 @@ npx serve dist -p 3000
 - **Environmental Metrics**: CO₂ saved, solar energy generated
 - **Performance Monitoring**: App speed, error tracking, user experience
 
+## 🤖 AI & Development Tools
+
+### Enhanced LLM Rotation System Features
+- **Multi-Provider Support**: OpenAI, Anthropic, Google, DeepSeek, Grok, OpenRouter, Hugging Face
+- **Intelligent Rotation**: Automatic provider switching based on token limits and task requirements
+- **Free Model Prioritization**: Automatically selects best free options for cost optimization
+- **Performance Metrics**: Success rates, response times, and cost tracking
+- **Capability Matching**: Matches provider strengths to specific tasks (coding, analysis, creative)
+
+### Usage Example
+```typescript
+import { llmTokenManager } from './llm-rotation-enhanced';
+
+// Automatic rotation check before API call
+const result = await llmTokenManager.preRotateCheck(
+  'openai', 'gpt-4o-mini', 'Help me debug this React component'
+);
+
+// If rotation needed, automatically switches to best provider
+if (!result.proceed && result.switchTo) {
+  console.log(`Switching to: ${result.switchTo.provider}/${result.switchTo.model}`);
+}
+```
+
 ## 🔐 Security & Compliance
 
 - **🛡️ Data Protection**: GDPR and CCPA compliant data handling
 - **🔒 Secure Payments**: PCI DSS compliant payment processing
 - **🔐 Authentication**: Secure user authentication and authorization
 - **📱 Device Security**: PWA security best practices
+- **🔑 API Key Protection**: Environment variable-based secret management
+
+## 📋 Project Status & Tasks
+
+### ✅ **Recently Completed Tasks**
+- **Enhanced LLM Rotation System Implementation**: Complete multi-provider rotation system
+- **Proactive Token Monitoring**: Predictive usage analysis with intelligent thresholds
+- **Cost Optimization Logic**: Free model prioritization and automatic fallback
+- **Comprehensive Testing Suite**: Full test coverage with TypeScript interfaces
+- **Documentation**: Complete integration guide and API documentation
+- **Security Audit**: Verified no secrets exposed in repository
+
+### 🎯 **Current Development Phase**
+
+#### Phase 1: Foundation (In Progress)
+- [ ] Replace mock API with real Supabase client
+- [ ] Implement basic user authentication
+- [ ] Create routing structure with protected routes
+- [ ] Connect core components to live data
+
+#### Phase 2: Core Features (Planned)
+- [ ] Build interactive Leaflet map with Binghamton locations
+- [ ] Develop ride booking and pricing system
+- [ ] Implement Stripe payment processing
+- [ ] Create mobile bodega shopping experience
+
+#### Phase 3: Advanced Features (Planned)
+- [ ] Add real-time ride tracking and notifications
+- [ ] Build driver and admin dashboards
+- [ ] Implement PWA features (offline, push notifications)
+- [ ] Develop eco-impact tracking and rewards
+
+#### Phase 4: Optimization (Planned)
+- [ ] Performance monitoring and optimization
+- [ ] Advanced map features (routes, traffic)
+- [ ] Social features and community building
+- [ ] Multi-language and accessibility improvements
+
+### 🚀 **Recently Added Capabilities**
+- **Multi-LLM Provider Integration**: Support for 7+ major LLM providers
+- **Intelligent Token Management**: Proactive rotation before limits reached
+- **Task-Based Provider Selection**: Automatic matching of provider capabilities
+- **Real-Time Performance Metrics**: Provider success rate and cost tracking
+- **Enterprise-Grade Rotation Logic**: Cooldown management and fallback systems
 
 ## 🤝 Contributing
 
@@ -220,3 +311,21 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Made with 🌱 by the AirBear team in Binghamton, NY**
 
 *"Zero emissions, infinite possibilities with AirBear's solar-powered future!"*
+
+**Latest Enhancement**: 🚀 **Enhanced LLM Rotation System** - Now automatically selects the best free LLM for coding tasks with proactive token monitoring and cost optimization!
+# Running the App
+
+- `npm run dev` — starts the Express/Supabase/Stripe API stack on port 5000 (keeps the mock warnings until you supply real secrets).
+- `cd client && npm run dev -- --host 0.0.0.0 --port 5173` — runs the Vite-powered PWA with HMR on port 5173.
+- `npm run all` — new helper that uses `concurrently` to launch both the backend and frontend together (useful for holistic testing).
+
+## Secrets & Configuration
+
+- Keep your Supabase/Stripe credentials in `.env` (never commit this file). Required vars include `DATABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, and any provider API keys used by the rotation system.
+- The backend loads `.env` automatically; restarting `npm run dev` (or `npm run all`) picks up fresh values so secrets stay in sync without manual repetition.
+- Refer to `.env.example` and `llm-rotation.env.example` for all required vars before deploying or running locally.
+
+## Next Steps
+
+- Validate the Stripe checkout and promo flows end-to-end with your keys (watch for `stripe_session_id` in Supabase).
+- Monitor the dashboard/order statuses to confirm paid statuses once the webhook fires.

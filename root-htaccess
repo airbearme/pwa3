@@ -1,0 +1,16 @@
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.html [QSA,L]
+
+<Files *.js>
+  Header set Cache-Control "max-age=31536000, immutable"
+</Files>
+<Files *.css>
+  Header set Cache-Control "max-age=31536000, immutable"  
+</Files>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/html "access plus 1 month"
+  ExpiresByType application/json "access plus 1 month"
+</IfModule>

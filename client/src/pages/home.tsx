@@ -505,7 +505,7 @@ export default function Home() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/auth">
+              <Link to="/login">
                 <Button 
                   size="lg" 
                   variant="secondary"

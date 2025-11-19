@@ -27,6 +27,27 @@ export interface PaymentResult {
   qrCode?: string;
 }
 
+export interface CheckoutLineItem {
+  price_data: {
+    currency: string;
+    product_data: {
+      name: string;
+      description?: string;
+    };
+    unit_amount: number;
+  };
+  quantity: number;
+}
+
+export interface CheckoutSessionRequest {
+  lineItems: CheckoutLineItem[];
+  successUrl: string;
+  cancelUrl: string;
+  userId: string;
+  orderId?: string;
+  metadata?: Record<string, string>;
+}
+
 export const createPaymentIntent = async (data: PaymentIntentData): Promise<PaymentResult> => {
   try {
     const response = await fetch('/api/create-payment-intent', {
@@ -255,6 +276,25 @@ export const processGooglePayPayment = async (data: PaymentIntentData): Promise<
       error: error.message || 'Google Pay initialization failed',
     };
   }
+};
+
+export const createCheckoutSession = async (
+  request: CheckoutSessionRequest
+): Promise<{ id: string; url: string }> => {
+  const response = await fetch("/api/payments/create-checkout-session", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(request),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: "Unknown error" }));
+    throw new Error(error.message || "Could not create checkout session");
+  }
+
+  return response.json();
 };
 
 export const generateCashQRCode = async (data: PaymentIntentData): Promise<PaymentResult> => {

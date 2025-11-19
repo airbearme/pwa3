@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { useAuth } from "@/hooks/use-auth";
+import { useAirbearSession } from "@/hooks/use-airbear-session";
 import { useToast } from "@/hooks/use-toast";
 import RickshawWheel from "@/components/airbear-wheel";
 import LoadingSpinner from "@/components/loading-spinner";
@@ -34,7 +34,7 @@ interface Reward {
 }
 
 export default function Rewards() {
-  const { user } = useAuth();
+  const { user } = useAirbearSession();
   const { toast } = useToast();
   const [claimedRewards, setClaimedRewards] = useState<string[]>([]);
 
@@ -45,7 +45,7 @@ export default function Rewards() {
       description: "One complimentary coffee from any AirBear bodega",
       pointsRequired: 100,
       category: "free_item",
-      isAvailable: user?.ecoPoints ? user.ecoPoints >= 100 : false,
+      isAvailable: (user?.user_metadata?.eco_points || user?.app_metadata?.eco_points || 0) >= 100,
       isClaimed: claimedRewards.includes("free-coffee"),
       icon: "☕",
       color: "bg-amber-500"
@@ -56,7 +56,7 @@ export default function Rewards() {
       description: "Half price on your next AirBear ride",
       pointsRequired: 150,
       category: "discount",
-      isAvailable: user?.ecoPoints ? user.ecoPoints >= 150 : false,
+      isAvailable: (user?.user_metadata?.eco_points || user?.app_metadata?.eco_points || 0) >= 150,
       isClaimed: claimedRewards.includes("discount-ride"),
       icon: "🚗",
       color: "bg-green-500"
@@ -67,7 +67,7 @@ export default function Rewards() {
       description: "Exclusive AirBear eco-warrior t-shirt",
       pointsRequired: 300,
       category: "exclusive",
-      isAvailable: user?.ecoPoints ? user.ecoPoints >= 300 : false,
+      isAvailable: (user?.user_metadata?.eco_points || user?.app_metadata?.eco_points || 0) >= 300,
       isClaimed: claimedRewards.includes("eco-tshirt"),
       icon: "👕",
       color: "bg-purple-500"
@@ -78,7 +78,7 @@ export default function Rewards() {
       description: "Skip the queue for one week",
       pointsRequired: 200,
       category: "experience",
-      isAvailable: user?.ecoPoints ? user.ecoPoints >= 200 : false,
+      isAvailable: (user?.user_metadata?.eco_points || user?.app_metadata?.eco_points || 0) >= 200,
       isClaimed: claimedRewards.includes("priority-access"),
       icon: "⚡",
       color: "bg-yellow-500"
@@ -89,7 +89,7 @@ export default function Rewards() {
       description: "One free item up to $10 from any bodega",
       pointsRequired: 250,
       category: "free_item",
-      isAvailable: user?.ecoPoints ? user.ecoPoints >= 250 : false,
+      isAvailable: (user?.user_metadata?.eco_points || user?.app_metadata?.eco_points || 0) >= 250,
       isClaimed: claimedRewards.includes("free-bodega"),
       icon: "🛍️",
       color: "bg-blue-500"
@@ -100,7 +100,7 @@ export default function Rewards() {
       description: "Exclusive digital badge for carbon neutral users",
       pointsRequired: 500,
       category: "exclusive",
-      isAvailable: user?.ecoPoints ? user.ecoPoints >= 500 : false,
+      isAvailable: (user?.user_metadata?.eco_points || user?.app_metadata?.eco_points || 0) >= 500,
       isClaimed: claimedRewards.includes("carbon-neutral"),
       icon: "🏆",
       color: "bg-emerald-500"
@@ -117,7 +117,7 @@ export default function Rewards() {
     });
   };
 
-  const currentPoints = user?.ecoPoints || 0;
+  const currentPoints = user?.user_metadata?.eco_points || user?.app_metadata?.eco_points || 0;
   const availableRewards = rewards.filter(r => r.isAvailable && !r.isClaimed);
   const claimedCount = claimedRewards.length;
 

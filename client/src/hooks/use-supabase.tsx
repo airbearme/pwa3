@@ -1,104 +1,112 @@
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode, useMemo } from "react";
+import type {
+  RealtimePostgresChangesPayload,
+  RealtimeChannel,
+  SupabaseClient,
+} from "@supabase/supabase-js";
+import { supabaseClient } from "../lib/supabaseClient";
 
-// Placeholder for Supabase integration
-// In a real app, this would initialize Supabase client and provide real-time features
+type SupabasePayload = RealtimePostgresChangesPayload<any>;
 
 interface SupabaseContextType {
-  // Real-time subscriptions
-  subscribeToRides: (callback: (payload: any) => void) => () => void;
-  subscribeToInventory: (callback: (payload: any) => void) => () => void;
-  subscribeToOrders: (callback: (payload: any) => void) => () => void;
-  
-  // Storage operations
+  client: SupabaseClient;
+  subscribeToRides: (callback: (payload: SupabasePayload) => void) => () => void;
+  subscribeToInventory: (callback: (payload: SupabasePayload) => void) => () => void;
+  subscribeToOrders: (callback: (payload: SupabasePayload) => void) => () => void;
   uploadFile: (bucket: string, path: string, file: File) => Promise<string>;
   downloadFile: (bucket: string, path: string) => Promise<string>;
-  
-  // Real-time presence
-  trackUserPresence: (userId: string) => void;
+  trackUserPresence: (userId: string) => Promise<void>;
   getOnlineUsers: () => Promise<string[]>;
 }
 
 const SupabaseContext = createContext<SupabaseContextType | undefined>(undefined);
 
+const presenceChannel = supabaseClient.channel("airbear-presence", {
+  config: { presence: { key: "airbear-presence-user" } },
+});
+try {
+  presenceChannel.subscribe();
+} catch (err) {
+  console.warn("Unable to subscribe to presence channel", err);
+}
+
+function createRealtimeSubscription(
+  table: string,
+  callback: (payload: SupabasePayload) => void
+) {
+  const channel = supabaseClient.channel(`airbear-${table}-updates`);
+  channel.on(
+    "postgres_changes",
+    { event: "*", schema: "public", table },
+    callback
+  );
+  try {
+    channel.subscribe();
+  } catch (err) {
+    console.warn(`Realtime subscribe failed for ${table}`, err);
+  }
+
+  return () => {
+    channel.unsubscribe();
+    supabaseClient.removeChannel(channel);
+  };
+}
+
 export function SupabaseProvider({ children }: { children: ReactNode }) {
-  // Mock implementations - replace with real Supabase client
-  const subscribeToRides = (callback: (payload: any) => void) => {
-    // Mock real-time subscription
-    const interval = setInterval(() => {
-      callback({
-        eventType: 'UPDATE',
-        new: { id: 'ride_123', status: 'in_progress' },
-        old: { id: 'ride_123', status: 'pending' }
-      });
-    }, 30000); // Update every 30 seconds
+  const subscribeToRides = (callback: (payload: SupabasePayload) => void) =>
+    createRealtimeSubscription("rides", callback);
 
-    return () => clearInterval(interval);
+  const subscribeToInventory = (callback: (payload: SupabasePayload) => void) =>
+    createRealtimeSubscription("inventory", callback);
+
+  const subscribeToOrders = (callback: (payload: SupabasePayload) => void) =>
+    createRealtimeSubscription("orders", callback);
+
+  const uploadFile = async (bucket: string, path: string, file: File) => {
+    const { data, error } = await supabaseClient.storage
+      .from(bucket)
+      .upload(path, file, { upsert: true });
+    if (error || !data) {
+      throw error ?? new Error("Failed to upload file");
+    }
+    return data.path;
   };
 
-  const subscribeToInventory = (callback: (payload: any) => void) => {
-    const interval = setInterval(() => {
-      callback({
-        eventType: 'UPDATE',
-        new: { rickshawId: 'rickshaw_456', itemId: 'item_789', quantity: 8 },
-        old: { rickshawId: 'rickshaw_456', itemId: 'item_789', quantity: 10 }
-      });
-    }, 60000); // Update every minute
-
-    return () => clearInterval(interval);
+  const downloadFile = async (bucket: string, path: string) => {
+    const { data, error } = await supabaseClient.storage.from(bucket).download(path);
+    if (error || !data) {
+      throw error ?? new Error("Failed to download file");
+    }
+    const url = URL.createObjectURL(data);
+    return url;
   };
 
-  const subscribeToOrders = (callback: (payload: any) => void) => {
-    const interval = setInterval(() => {
-      callback({
-        eventType: 'INSERT',
-        new: { id: 'order_' + Date.now(), status: 'pending' }
-      });
-    }, 120000); // New order every 2 minutes
-
-    return () => clearInterval(interval);
+  const trackUserPresence = async (userId: string) => {
+    try {
+      await presenceChannel.track({ userId });
+    } catch (err) {
+      console.warn("Unable to track user presence", err);
+    }
   };
 
-  const uploadFile = async (bucket: string, path: string, file: File): Promise<string> => {
-    // Mock file upload
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(`https://mock-supabase.com/${bucket}/${path}`);
-      }, 1000);
-    });
+  const getOnlineUsers = async () => {
+    const state = presenceChannel.presenceState();
+    return Object.keys(state);
   };
 
-  const downloadFile = async (bucket: string, path: string): Promise<string> => {
-    // Mock file download
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(`https://mock-supabase.com/${bucket}/${path}`);
-      }, 500);
-    });
-  };
-
-  const trackUserPresence = (userId: string) => {
-    // Mock presence tracking
-    console.log(`Tracking presence for user: ${userId}`);
-  };
-
-  const getOnlineUsers = async (): Promise<string[]> => {
-    // Mock online users
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(['user1', 'user2', 'user3']);
-      }, 100);
-    });
-  };
-
-  const value = {
-    subscribeToRides,
-    subscribeToInventory,
-    subscribeToOrders,
-    uploadFile,
-    downloadFile,
-    trackUserPresence,
-    getOnlineUsers,
-  };
+  const value = useMemo(
+    () => ({
+      client: supabaseClient,
+      subscribeToRides,
+      subscribeToInventory,
+      subscribeToOrders,
+      uploadFile,
+      downloadFile,
+      trackUserPresence,
+      getOnlineUsers,
+    }),
+    []
+  );
 
   return (
     <SupabaseContext.Provider value={value}>

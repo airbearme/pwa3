@@ -1,0 +1,31 @@
+name: Deploy to IONOS SFTP
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy AirBear PWA to IONOS via SFTP
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Deploy via SFTP
+        run: node scripts/deploy-ionos.js
+        env:
+          IONOS_FTP_HOST: ${{ secrets.IONOS_SFTP_HOST }}
+          IONOS_FTP_USER: ${{ secrets.IONOS_SFTP_USER }}
+          IONOS_FTP_PASSWORD: ${{ secrets.IONOS_SFTP_PASSWORD }}
+          IONOS_SFTP_PORT: ${{ secrets.IONOS_SFTP_PORT || '22' }}

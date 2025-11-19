@@ -1,5 +1,39 @@
 import type { Config } from "tailwindcss";
 
+const importedColors = require("tailwindcss/colors");
+const defaultTheme = require("tailwindcss/defaultTheme");
+
+const deprecatedColorNames = [
+  "lightBlue",
+  "warmGray",
+  "trueGray",
+  "coolGray",
+  "blueGray",
+];
+
+const colorDescriptors = Object.getOwnPropertyDescriptors(importedColors);
+deprecatedColorNames.forEach((name) => {
+  delete colorDescriptors[name];
+});
+
+const sanitizedColors = {};
+for (const [name, descriptor] of Object.entries(colorDescriptors)) {
+  Object.defineProperty(sanitizedColors, name, descriptor);
+}
+
+const baseDefaultColors =
+  typeof defaultTheme.colors === "function" || !defaultTheme.colors
+    ? {}
+    : defaultTheme.colors;
+
+defaultTheme.colors = {
+  ...sanitizedColors,
+  ...baseDefaultColors,
+};
+
+const tailwindAnimate = require("tailwindcss-animate");
+const typography = require("@tailwindcss/typography");
+
 export default {
   darkMode: ["class"],
   content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
@@ -250,8 +284,5 @@ export default {
       },
     },
   },
-  plugins: [
-    require("tailwindcss-animate"), 
-    require("@tailwindcss/typography"),
-  ],
+  plugins: [tailwindAnimate, typography],
 } satisfies Config;

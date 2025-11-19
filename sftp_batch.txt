@@ -1,0 +1,3 @@
+mkdir airbear-deploy-temp
+put airbear-pwa.tar.gz airbear-deploy-temp/
+bye

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useAuth } from "@/hooks/use-auth";
+import { useAirbearSession } from "@/hooks/use-airbear-session";
 import { useToast } from "@/hooks/use-toast";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import RickshawWheel from "@/components/airbear-wheel";
@@ -45,7 +45,7 @@ interface Rickshaw {
 }
 
 export default function Map() {
-  const { user } = useAuth();
+  const { user } = useAirbearSession();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const mapInstanceRef = useRef<any>(null);
@@ -57,6 +57,7 @@ export default function Map() {
 
   const { data: spotsData, isLoading: spotsLoading } = useQuery<Spot[]>({
     queryKey: ["/api/spots"],
+    initialData: spots,
   });
 
   const { data: rickshaws, isLoading: rickshawsLoading } = useQuery<Rickshaw[]>({
@@ -65,6 +66,8 @@ export default function Map() {
 
   // Calculate available AirBears count for map overlay
   const availableAirbearsCount = rickshaws?.filter(r => r.isAvailable).length || 0;
+  const totalSpots = spotsData?.length || 0;
+  const chargingAirbearsCount = rickshaws?.filter(r => r.isCharging).length || 0;
 
   const {
     isSubscribed,
@@ -190,6 +193,45 @@ export default function Map() {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Discover all 16 AirBear spots across Binghamton with real-time availability
           </p>
+        </motion.div>
+
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          {[
+            {
+              label: "Active Spots",
+              value: totalSpots,
+              description: "Strategic Binghamton coverage",
+            },
+            {
+              label: "Available AirBears",
+              value: availableAirbearsCount,
+              description: "Ready for pickup",
+            },
+            {
+              label: "Charging AirBears",
+              value: chargingAirbearsCount,
+              description: "Solar power in the bank",
+            },
+            {
+              label: "Instant ETA",
+              value: "4m",
+              description: "Average wait time",
+            },
+          ].map(card => (
+            <div
+              key={card.label}
+              className="rounded-2xl border border-white/10 bg-muted/30 p-4 text-left shadow-xl shadow-cyan-500/10"
+            >
+              <p className="text-xs uppercase tracking-[0.4em] text-cyan-300">{card.label}</p>
+              <p className="text-2xl font-bold text-white mt-2">{card.value}</p>
+              <p className="text-sm text-muted-foreground">{card.description}</p>
+            </div>
+          ))}
         </motion.div>
 
         {/* Booking Status Info */}
