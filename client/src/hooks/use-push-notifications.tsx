@@ -122,8 +122,7 @@ export const usePushNotifications = () => {
 
       const registration = await navigator.serviceWorker.ready;
 
-      // You'll need to replace this with your actual VAPID public key
-      const vapidPublicKey = 'BNQxGxE1C8fGpQ4Z9Y0K9F8G7H6I5J4K3L2M1N0O9P8Q7R6S5T4U3V2W1X0Y9Z8';
+      const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
 
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
